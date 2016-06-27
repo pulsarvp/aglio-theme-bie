@@ -1,0 +1,15 @@
+{
+	"lessc": {
+		"paths": [
+			"node_modules"
+		],
+		"cleancss": true,
+		"compress": true,
+		"yuicompress": true,
+		"optimization": 2
+	},
+	"path": ".",
+	"source": [
+		"src/index.md"
+	]
+}
