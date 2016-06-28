@@ -19,7 +19,7 @@ module.exports = function (grunt) {
 					{
 						expand : true,
 						flatten : true,
-						src : [ 'bower_components/fontawesome/fonts/*' ],
+						src : [ 'node_modules/font-awesome/fonts/*' ],
 						dest : '<%= cfg.path %>/font/fontawesome/',
 						filter : 'isFile'
 					}
@@ -31,8 +31,8 @@ module.exports = function (grunt) {
 						expand : true,
 						flatten : true,
 						src : [
-							'bower_components/jquery/dist/jquery.min.js',
-							'bower_components/bootstrap/dist/js/bootstrap.min.js'
+							'node_modules/jquery/dist/jquery.min.js',
+							'node_modules/bootstrap/dist/js/bootstrap.min.js'
 						],
 						dest : '<%= cfg.path %>/js/',
 						filter : 'isFile'
