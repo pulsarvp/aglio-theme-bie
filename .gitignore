@@ -1,3 +1,5 @@
 .idea
 node_modules
-config.json
+.npmignore
+npm-debug.log
+_package.json

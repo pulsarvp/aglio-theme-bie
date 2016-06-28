@@ -7,9 +7,5 @@
 		"compress": true,
 		"yuicompress": true,
 		"optimization": 2
-	},
-	"path": ".",
-	"source": [
-		"src/index.md"
-	]
+	}
 }
