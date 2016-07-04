@@ -21,6 +21,7 @@
 		"stylus": ">=0.50.0 <1.0.0"
 	},
 	"scripts": {
-		"build": "coffeelint src/*.coffee && coffee -o lib -c src"
+		"build": "coffeelint src/*.coffee && coffee -o lib -c src",
+		"prepublish": "npm run build"
 	}
 }
