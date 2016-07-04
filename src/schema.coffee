@@ -10,7 +10,7 @@
 # * One Of (mutually exclusive) properties
 #
 # It is missing support for many advanced features.
-{deepEqual} = require 'assert'
+{ deepEqual } = require 'assert'
 inherit = require './inherit'
 
 module.exports = renderSchema = (root, dataStructures) ->
@@ -21,6 +21,7 @@ module.exports = renderSchema = (root, dataStructures) ->
       if root.attributes?.default?
         schema.default = root.attributes.default
     when 'enum'
+      schema.type = 'enum'
       schema.enum = []
       for item in root.content or []
         schema.enum.push item.content
@@ -35,7 +36,8 @@ module.exports = renderSchema = (root, dataStructures) ->
         try
           schema.items = items.reduce (l, r) -> deepEqual(l, r) or r
         catch
-          schema.items = 'anyOf': items
+          schema.items =
+            'anyOf': items
     when 'object', 'option'
       schema.type = 'object'
       schema.properties = {}
@@ -58,11 +60,14 @@ module.exports = renderSchema = (root, dataStructures) ->
               exclusive.push key
               schema.properties[key] = prop
           if not schema.allOf then schema.allOf = []
-          schema.allOf.push not: required: exclusive
+          schema.allOf.push not:
+            required: exclusive
           continue
         key = member.content.key.content
         schema.properties[key] = renderSchema(
           member.content.value, dataStructures)
+        schema.properties[key].name = key
+        schema.properties[key].required = false
         if member.meta?.description?
           schema.properties[key].description = member.meta.description
         if member.attributes?.typeAttributes
@@ -71,8 +76,8 @@ module.exports = renderSchema = (root, dataStructures) ->
             if required.indexOf(key) is -1 then required.push key
           if typeAttr.indexOf('nullable') isnt -1
             schema.properties[key].type = [schema.properties[key].type, 'null']
-      if required.length
-        schema.required = required
+      for name in required
+        schema.properties[name].required = true
     else
       ref = dataStructures[root.element]
       if ref

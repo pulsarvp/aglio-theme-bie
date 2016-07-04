@@ -190,23 +190,6 @@ mixin ResourceGroup(resourceGroup, getButtonClass, multipage)
 							h4= 'Examples'
 							+Examples(resourceGroup, resource, action)
 
-mixin Paginate(resourceGroups, index)
-	if index < resourceGroups.length - 1
-		a.btn.btn-default.pull-right(href="#page:#{slug(resourceGroups[index + 1].name)}")
-			| Next&nbsp;
-			i.fa.fa-arrow-circle-right
-
-	if index > 0
-		a.btn.btn-default(href="#page:#{slug(resourceGroups[index - 1].name)}")
-			i.fa.fa-arrow-circle-left
-			|  Previous
-	else
-		a.btn.btn-default(href="#")
-			i.fa.fa-arrow-circle-left
-			|  Previous
-	.clearfix
-	hr
-
 mixin Icon(method)
 	case method
 		when 'GET'

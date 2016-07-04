@@ -366,14 +366,12 @@ decorate = (api, md, slugCache, verbose) ->
               # If there is no schema, but there are MSON attributes, then try
               # to generate the schema. This will fail sometimes.
               # TODO: Remove me when Drafter is released.
-              if not item.schema and item.content
+              if item.content
                 for dataStructure in item.content
                   if dataStructure.element is 'dataStructure'
                     try
-                      schema = renderSchema(
-                        dataStructure.content[0], dataStructures)
-                      schema['$schema'] =
-                        'http://json-schema.org/draft-04/schema#'
+                      schema = renderSchema(dataStructure.content[0], dataStructures)
+                      console.log(schema)
                       item.schema = JSON.stringify(schema, null, 2)
                     catch err
                       if verbose
