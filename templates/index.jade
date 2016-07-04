@@ -32,23 +32,3 @@ html
 
 		script(src="js/jquery.min.js")
 		script(src="js/bootstrap.min.js")
-
-	if livePreview
-		script(src="/socket.io/socket.io.js")
-	script
-		:coffee
-			# Show a warning when viewed as a local file, which will break the
-			# links above that start with `//`.
-			if location.protocol is 'file:'
-				document.getElementById('localFile').style.display = 'block';
-	block scripts
-		script
-			:coffee
-				$('table').addClass 'table'
-
-		if livePreview
-			script
-				:coffee
-					socket = io()
-					socket.on "refresh", (msg) ->
-						$(document.body).html(msg)

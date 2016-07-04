@@ -4,15 +4,24 @@ a[data-target]
 {
 	cursor: pointer;
 }
+
 body, html
 {
 	height: 100%;
 }
+
+body
+{
+	margin: 0;
+	padding: 0;
+}
+
 code
 {
 	background-color: #ddd;
 	color: #444;
 }
+
 h1, h2, h3, h4, h5
 {
 	&:hover
@@ -23,10 +32,12 @@ h1, h2, h3, h4, h5
 		}
 	}
 }
+
 p:last-child
 {
 	margin-bottom: 0;
 }
+
 pre
 {
 	font-size: 12px;
@@ -63,7 +74,7 @@ pre
 	{
 		margin-left: 3px;
 		color: #c7254e;
-		background-color: rgba(255,255,255,0.7);
+		background-color: rgba(255, 255, 255, 0.7);
 		white-space: pre-wrap;
 		white-space: -moz-pre-wrap;
 		white-space: -pre-wrap;
@@ -97,6 +108,7 @@ pre
 	}
 
 }
+
 .list-group-item
 {
 	padding-left: @line-height-computed;
@@ -110,16 +122,18 @@ pre
 		}
 	}
 }
+
 .lowercase
 {
 	text-transform: lowercase;
 }
+
 .content
 {
 	display: table-cell;
 	padding-left: @nav-width;
 	vertical-align: top;
-	&>*
+	& > *
 	{
 		margin: 0;
 		padding: @line-height-computed;
@@ -161,15 +175,33 @@ pre
 		padding: @line-height-computed/2 @line-height-computed;
 		code
 		{
-			background: #F9F2F4;
-			color: #C7254E;
+			background: #f9f2f4;
+			color: #c7254e;
 		}
-		&.danger	{ .action-heading-variant(@panel-danger-heading-bg,	 @panel-danger-border,	@panel-danger-text); }
-		&.default	{ .action-heading-variant(@panel-default-heading-bg, @panel-default-border,	@panel-default-text); }
-		&.info		{ .action-heading-variant(@panel-info-heading-bg,	 @panel-info-border,	@panel-info-text); }
-		&.primary	{ .action-heading-variant(@panel-primary-heading-bg, @panel-primary-border,	@panel-primary-text); }
-		&.success	{ .action-heading-variant(@panel-success-heading-bg, @panel-success-border,	@panel-success-text); }
-		&.warning	{ .action-heading-variant(@panel-warning-heading-bg, @panel-warning-border,	@panel-warning-text); }
+		&.danger
+		{
+			.action-heading-variant(@panel-danger-heading-bg, @panel-danger-border, @panel-danger-text);
+		}
+		&.default
+		{
+			.action-heading-variant(@panel-default-heading-bg, @panel-default-border, @panel-default-text);
+		}
+		&.info
+		{
+			.action-heading-variant(@panel-info-heading-bg, @panel-info-border, @panel-info-text);
+		}
+		&.primary
+		{
+			.action-heading-variant(@panel-primary-heading-bg, @panel-primary-border, @panel-primary-text);
+		}
+		&.success
+		{
+			.action-heading-variant(@panel-success-heading-bg, @panel-success-border, @panel-success-text);
+		}
+		&.warning
+		{
+			.action-heading-variant(@panel-warning-heading-bg, @panel-warning-border, @panel-warning-text);
+		}
 	}
 	.action-parameters
 	{
@@ -303,6 +335,7 @@ pre
 		}
 	}
 }
+
 .navigation
 {
 	background: #333;
@@ -359,6 +392,7 @@ pre
 		}
 	}
 }
+
 .page
 {
 	display: table;

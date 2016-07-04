@@ -52,6 +52,15 @@ highlight = (code, lang, subset) ->
   benchmark.end "highlight #{lang}"
   return response.trim()
 
+copyFile = (from, to) ->
+  fs.createReadStream(from).pipe(fs.createWriteStream(to))
+
+copyFiles = (fromDir, toDir) ->
+  list = fs.readdirSync fromDir
+  for f in list
+    fs.createReadStream(path.join fromDir, f).pipe(fs.createWriteStream(path.join toDir, f))
+  true
+
 getCss = (dest, verbose, done) ->
 # Get the CSS for the given variables and style.
 # The CSS is generated via a dummy LESS file with imports to the
@@ -88,7 +97,7 @@ getCss = (dest, verbose, done) ->
     done null, css
 
 getFont = (dest, verbose, done) ->
-  dest = path.join dest, 'font'
+  dest = path.join dest, 'font/fontawesome'
 
   if not fs.existsSync dest
     fs.mkdir dest, 0o755
@@ -99,10 +108,46 @@ getFont = (dest, verbose, done) ->
   from = path.join ROOT, '..', 'font-awesome/fonts'
 
   try
-    fs.recurse from, ['*wesome.*'], (filepath, relative, filename) ->
-      console.log path.join filepath, filename
+    copyFiles(from, dest)
   catch
     return done('Error copying font files')
+
+  done null
+
+getImg = (dest, verbose, done) ->
+  dest = path.join dest, 'img'
+
+  if not fs.existsSync dest
+    fs.mkdir dest, 0o755
+
+  if verbose
+    console.log 'Copying image files...'
+
+  from = path.join ROOT, 'img'
+
+  try
+    copyFiles(from, dest)
+  catch
+    return done('Error copying image files')
+
+  done null
+
+getJs = (dest, verbose, done) ->
+  dest = path.join dest, 'js'
+
+  if not fs.existsSync dest
+    fs.mkdir dest, 0o755
+
+  if verbose
+    console.log 'Copying JS files...'
+
+  try
+    copyFile path.join(ROOT, '..', 'jquery/dist/jquery.min.js'), path.join(dest, 'jquery.min.js')
+    copyFile path.join(ROOT, '..', 'bootstrap/dist/js/bootstrap.min.js'), path.join(dest, 'bootstrap.min.js')
+  catch
+    return done('Error copying JS files')
+
+  done null
 
 compileTemplate = (filename, options) ->
   compiled = """
@@ -458,35 +503,41 @@ exports.render = (input, options, done) ->
   getFont options.themeDest, verbose, (err, css) ->
     if err then return done(errMsg 'Could not proccess Font-Awesome', err)
 
-    getCss options.themeDest, verbose, (err, css) ->
-      if err then return done(errMsg 'Could not get CSS', err)
-      benchmark.end 'css-total'
+    getJs options.themeDest, verbose, (err, css) ->
+      if err then return done(errMsg 'Could not proccess JS files', err)
 
-      locals =
-        api: input
-        condenseNav: options.themeCondenseNav
-        css: css
-        fullWidth: options.themeFullWidth
-        date: moment
-        hash: (value) ->
-          crypto.createHash('md5').update(value.toString()).digest('hex')
-        highlight: highlight
-        markdown: (content) -> md.render content
-        slug: slug.bind(slug, slugCache)
-        urldec: (value) -> querystring.unescape(value)
+      getImg options.themeDest, verbose, (err, css) ->
+        if err then return done(errMsg 'Could not proccess images', err)
 
-      for key, value of options.locals or {}
-        locals[key] = value
+        getCss options.themeDest, verbose, (err, css) ->
+          if err then return done(errMsg 'Could not get CSS', err)
+          benchmark.end 'css-total'
 
-      benchmark.start 'get-template'
-      getTemplate options.themeTemplate, verbose, (getTemplateErr, renderer) ->
-        if getTemplateErr
-          return done(errMsg 'Could not get template', getTemplateErr)
-        benchmark.end 'get-template'
+          locals =
+            api: input
+            condenseNav: options.themeCondenseNav
+            css: css
+            fullWidth: options.themeFullWidth
+            date: moment
+            hash: (value) ->
+              crypto.createHash('md5').update(value.toString()).digest('hex')
+            highlight: highlight
+            markdown: (content) -> md.render content
+            slug: slug.bind(slug, slugCache)
+            urldec: (value) -> querystring.unescape(value)
 
-        benchmark.start 'call-template'
-        try html = renderer locals
-        catch err
-          return done(errMsg 'Error calling template during rendering', err)
-        benchmark.end 'call-template'
-        done null, html
+          for key, value of options.locals or {}
+            locals[key] = value
+
+          benchmark.start 'get-template'
+          getTemplate options.themeTemplate, verbose, (getTemplateErr, renderer) ->
+            if getTemplateErr
+              return done(errMsg 'Could not get template', getTemplateErr)
+            benchmark.end 'get-template'
+
+            benchmark.start 'call-template'
+            try html = renderer locals
+            catch err
+              return done(errMsg 'Error calling template during rendering', err)
+            benchmark.end 'call-template'
+            done null, html
