@@ -10,7 +10,7 @@
 # + id (string)
 
 # Make sure all members are unique, removing all duplicates before the last
-# occurence of the member key name.
+# occurrence of the member key name.
 uniqueMembers = (content) ->
   known = []
   i = content.length - 1

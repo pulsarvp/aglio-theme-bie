@@ -14,8 +14,6 @@ renderSchema = require './schema'
 # The root directory of this project
 ROOT = path.dirname __dirname
 
-cache = {}
-
 # Utility for benchmarking
 benchmark =
   start: (message) -> if process.env.BENCHMARK then console.time message
@@ -31,24 +29,12 @@ sha1 = (value) ->
   crypto.createHash('sha1').update(value.toString()).digest('hex')
 
 # A function to create ID-safe slugs. If `unique` is passed, then
-# unique slugs are returned for the same input. The cache is just
-# a plain object where the keys are the sluggified name.
-slug = (cache={}, value='', unique=false) ->
+# unique slugs are returned for the same input.
+slug = ({}, value = '', unique = false) ->
   sluggified = value.toLowerCase()
-                    .replace(/[ \t\n\\<>"'=:/]/g, '-')
-                    .replace(/-+/g, '-')
-                    .replace(/^-/, '')
-
-  if unique
-    while cache[sluggified]
-      # Already exists, so let's try to make it unique.
-      if sluggified.match /\d+$/
-        sluggified = sluggified.replace /\d+$/, (value) ->
-          parseInt(value) + 1
-      else
-        sluggified = sluggified + '-1'
-
-  cache[sluggified] = true
+  .replace(/[ \t\n\\<>"'=:/]/g, '-')
+  .replace(/-+/g, '-')
+  .replace(/^-/, '')
 
   return sluggified
 
@@ -61,126 +47,62 @@ highlight = (code, lang, subset) ->
     when 'no-highlight' then code
     when undefined, null, ''
       hljs.highlightAuto(code, subset).value
-    else hljs.highlight(lang, code).value
+    else
+      hljs.highlight(lang, code).value
   benchmark.end "highlight #{lang}"
   return response.trim()
 
-getCached = (key, compiledPath, sources, load, done) ->
-  # Disable the template/css caching?
-  if process.env.NOCACHE then return done null
+getCss = (dest, verbose, done) ->
+# Get the CSS for the given variables and style.
+# The CSS is generated via a dummy LESS file with imports to the
+# default variables, any custom override variables, and the given
+# layout style. Both variables and style support special values,
+# for example `flatly` might load `styles/variables-flatly.less`.
+# See the `styles` directory for available options.
+  dest = path.join dest, 'css'
 
-  # Already loaded? Just return it!
-  if cache[key] then return done null, cache[key]
+  if not fs.existsSync dest
+    fs.mkdir dest, 0o755
 
-  # Next, try to check if the compiled path exists and is newer than all of
-  # the sources. If so, load the compiled path into the in-memory cache.
-  try
-    if fs.existsSync compiledPath
-      compiledStats = fs.statSync compiledPath
+  to = path.join dest, "app.min.css"
 
-      for source in sources
-        sourceStats = fs.statSync source
-        if sourceStats.mtime > compiledStats.mtime
-          # There is a newer source file, so we ignore the compiled
-          # version on disk. It'll be regenerated later.
-          return done null
+  from = path.join ROOT, 'less', 'app.less'
 
-      try
-        load compiledPath, (err, item) ->
-          if err then return done(errMsg 'Error loading cached resource', err)
-
-          cache[key] = item
-          done null, cache[key]
-      catch loadErr
-        return done(errMsg 'Error loading cached resource', loadErr)
-    else
-      done null
-  catch err
-    done err
-
-getCss = (variables, styles, verbose, done) ->
-  # Get the CSS for the given variables and style. This method caches
-  # its output, so subsequent calls will be extremely fast but will
-  # not reload potentially changed data from disk.
-  # The CSS is generated via a dummy LESS file with imports to the
-  # default variables, any custom override variables, and the given
-  # layout style. Both variables and style support special values,
-  # for example `flatly` might load `styles/variables-flatly.less`.
-  # See the `styles` directory for available options.
-  key = "css-#{variables}-#{styles}"
-  if cache[key] then return done null, cache[key]
-
-  # Not cached in memory, but maybe it's already compiled on disk?
-  compiledPath = path.join ROOT, 'cache',
-    "#{sha1 key}.css"
-
-  defaultVariablePath = path.join ROOT, 'styles', 'variables-default.less'
-  sources = [defaultVariablePath]
-
-  if not Array.isArray(variables) then variables = [variables]
-  if not Array.isArray(styles) then styles = [styles]
-
-  variablePaths = [defaultVariablePath]
-  for item in variables
-    if item isnt 'default'
-      customPath = path.join ROOT, 'styles', "variables-#{item}.less"
-      if not fs.existsSync customPath
-        customPath = item
-        if not fs.existsSync customPath
-          return done new Error "#{customPath} does not exist!"
-      variablePaths.push customPath
-      sources.push customPath
-
-  stylePaths = []
-  for item in styles
-    customPath = path.join ROOT, 'styles', "layout-#{item}.less"
-    if not fs.existsSync customPath
-      customPath = item
-      if not fs.existsSync customPath
-        return done new Error "#{customPath} does not exist!"
-    stylePaths.push customPath
-    sources.push customPath
-
-  load = (filename, loadDone) ->
-    fs.readFile filename, 'utf-8', loadDone
+  s = "@import \"#{from}\";\n"
 
   if verbose
-    console.log "Using variables #{variablePaths}"
-    console.log "Using styles #{stylePaths}"
-    console.log "Checking cache #{compiledPath}"
+    console.log 'Generating CSS...'
 
-  getCached key, compiledPath, sources, load, (err, css) ->
-    if err then return done err
-    if css
-      if verbose then console.log 'Cached version loaded'
-      return done null, css
+  benchmark.start 'less-compile'
+  less.render s, { paths: ['node_modules'], compress: true, cleancss: true, "yuicompress": true, "optimization": 2 }, (err, result) ->
+    if err then return done(errMsg 'Error processing LESS -> CSS', err)
 
-    # Not cached, so let's create the file.
-    if verbose
-      console.log 'Not cached or out of date. Generating CSS...'
+    try
+      css = result.css
+      fs.writeFileSync to, css, 'utf-8'
+    catch writeErr
+      return done(errMsg 'Error writing CSS to file', writeErr)
 
-    tmp = ''
+    benchmark.end 'less-compile'
 
-    for customPath in variablePaths
-      tmp += "@import \"#{customPath}\";\n"
+    done null, css
 
-    for customPath in stylePaths
-      tmp += "@import \"#{customPath}\";\n"
+getFont = (dest, verbose, done) ->
+  dest = path.join dest, 'font'
 
-    benchmark.start 'less-compile'
-    less.render tmp, compress: true, (err, result) ->
-      if err then return done(msgErr 'Error processing LESS -> CSS', err)
+  if not fs.existsSync dest
+    fs.mkdir dest, 0o755
 
-      try
-        css = result.css
-        fs.writeFileSync compiledPath, css, 'utf-8'
-      catch writeErr
-        return done(errMsg 'Error writing cached CSS to file', writeErr)
+  if verbose
+    console.log 'Copying font files...'
 
-      benchmark.end 'less-compile'
+  from = path.join ROOT, '..', 'font-awesome/fonts'
 
-      cache[key] = css
-      done null, cache[key]
+  try
+    fs.recurse from, ['*wesome.*'], (filepath, relative, filename) ->
+      console.log path.join filepath, filename
+  catch
+    return done('Error copying font files')
 
 compileTemplate = (filename, options) ->
   compiled = """
@@ -190,21 +112,14 @@ compileTemplate = (filename, options) ->
   """
 
 getTemplate = (name, verbose, done) ->
-  # Check if this is a built-in template name
+# Check if this is a built-in template name
   builtin = path.join(ROOT, 'templates', "#{name}.jade")
   if not fs.existsSync(name) and fs.existsSync(builtin)
     name = builtin
 
-  # Get the template function for the given path. This will load and
-  # compile the template if necessary, and cache it for future use.
-  key = "template-#{name}"
-
-  # Check if it is cached in memory. If not, then we'll check the disk.
-  if cache[key] then return done null, cache[key]
-
   # Check if it is compiled on disk and not older than the template file.
   # If not present or outdated, then we'll need to compile it.
-  compiledPath = path.join ROOT, 'cache', "#{sha1 key}.js"
+  compiledPath = path.join ROOT, 'js', "app.js"
 
   load = (filename, loadDone) ->
     try
@@ -216,68 +131,60 @@ getTemplate = (name, verbose, done) ->
 
   if verbose
     console.log "Using template #{name}"
-    console.log "Checking cache #{compiledPath}"
 
-  getCached key, compiledPath, [name], load, (err, template) ->
-    if err then return done err
-    if template
-      if verbose then console.log 'Cached version loaded'
-      return done null, template
+  if verbose
+    console.log 'Generating template JS...'
 
-    if verbose
-      console.log 'Not cached or out of date. Generating template JS...'
+  # We need to compile the template. This is interesting
+  # because we are compiling to a client-side template, then adding some
+  # module-specific code to make it work here. This allows us to save time
+  # in the future by just loading the generated javascript function.
+  benchmark.start 'jade-compile'
+  compileOptions =
+    filename: name
+    name: 'compiledFunc'
+    self: true
+    compileDebug: false
 
-    # We need to compile the template, then cache it. This is interesting
-    # because we are compiling to a client-side template, then adding some
-    # module-specific code to make it work here. This allows us to save time
-    # in the future by just loading the generated javascript function.
-    benchmark.start 'jade-compile'
-    compileOptions =
-      filename: name
-      name: 'compiledFunc'
-      self: true
-      compileDebug: false
+  try
+    compiled = compileTemplate name, compileOptions
+  catch compileErr
+    return done(errMsg 'Error compiling template', compileErr)
+
+  if compiled.indexOf('self.') is -1
+# Not using self, so we probably need to recompile into compatibility
+# mode. This is slower, but keeps things working with Jade files
+# designed for Aglio 1.x.
+    compileOptions.self = false
 
     try
       compiled = compileTemplate name, compileOptions
     catch compileErr
       return done(errMsg 'Error compiling template', compileErr)
 
-    if compiled.indexOf('self.') is -1
-      # Not using self, so we probably need to recompile into compatibility
-      # mode. This is slower, but keeps things working with Jade files
-      # designed for Aglio 1.x.
-      compileOptions.self = false
+  try
+    fs.writeFileSync compiledPath, compiled, 'utf-8'
+  catch writeErr
+    return done(errMsg 'Error writing template file', writeErr)
 
-      try
-        compiled = compileTemplate name, compileOptions
-      catch compileErr
-        return done(errMsg 'Error compiling template', compileErr)
+  benchmark.end 'jade-compile'
 
-    try
-      fs.writeFileSync compiledPath, compiled, 'utf-8'
-    catch writeErr
-      return done(errMsg 'Error writing cached template file', writeErr)
-
-    benchmark.end 'jade-compile'
-
-    cache[key] = require(compiledPath)
-    done null, cache[key]
+  done null, require(compiledPath)
 
 modifyUriTemplate = (templateUri, parameters, colorize) ->
-  # Modify a URI template to only include the parameter names from
-  # the given parameters. For example:
-  # URI template: /pages/{id}{?verbose}
-  # Parameters contains a single `id` parameter
-  # Output: /pages/{id}
+# Modify a URI template to only include the parameter names from
+# the given parameters. For example:
+# URI template: /pages/{id}{?verbose}
+# Parameters contains a single `id` parameter
+# Output: /pages/{id}
   parameterValidator = (b) ->
-    # Compare the names, removing the special `*` operator
+# Compare the names, removing the special `*` operator
     parameterNames.indexOf(
       querystring.unescape b.replace(/^\*|\*$/, '')) isnt -1
   parameterNames = (param.name for param in parameters)
   parameterBlocks = []
   lastIndex = index = 0
-  while (index = templateUri.indexOf("{", index)) isnt - 1
+  while (index = templateUri.indexOf("{", index)) isnt -1
     parameterBlocks.push templateUri.substring(lastIndex, index)
     block = {}
     closeIndex = templateUri.indexOf("}", index)
@@ -301,16 +208,15 @@ modifyUriTemplate = (templateUri, parameters, colorize) ->
       segment.push "+" if v.reservedSet and not colorize
       segment.push v.parameters.map((name) ->
         if not colorize then name else
-          # TODO: handle errors here?
+# TODO: handle errors here?
           name = name.replace(/^\*|\*$/, '')
           param = parameters[parameterNames.indexOf(querystring.unescape name)]
           if v.querySet or v.formSet
             "<span class=\"hljs-attribute\">#{name}=</span>" +
               "<span class=\"hljs-literal\">#{param.example || ''}</span>"
           else
-            "<span class=\"hljs-attribute\" title=\"#{name}\">#{
-              param.example || name}</span>"
-        ).join(if colorize then '&' else ',')
+            "<span class=\"hljs-attribute\" title=\"#{name}\">#{param.example || name}</span>"
+      ).join(if colorize then '&' else ',')
       if not colorize
         segment.push "}"
       uri.push segment.join("")
@@ -318,11 +224,11 @@ modifyUriTemplate = (templateUri, parameters, colorize) ->
   , []).join('').replace(/\/+/g, '/')
 
 decorate = (api, md, slugCache, verbose) ->
-  # Decorate an API Blueprint AST with various pieces of information that
-  # will be useful for the theme. Anything that would significantly
-  # complicate the Jade template should probably live here instead!
+# Decorate an API Blueprint AST with various pieces of information that
+# will be useful for the theme. Anything that would significantly
+# complicate the Jade template should probably live here instead!
 
-  # Use the slug caching mechanism
+# Use the slug caching mechanism
   slugify = slug.bind slug, slugCache
 
   # Find data structures. This is a temporary workaround until Drafter is
@@ -348,7 +254,7 @@ decorate = (api, md, slugCache, verbose) ->
       api.host = meta.value
 
   for resourceGroup in api.resourceGroups or []
-    # Element ID and link
+# Element ID and link
     resourceGroup.elementId = slugify resourceGroup.name, true
     resourceGroup.elementLink = "##{resourceGroup.elementId}"
 
@@ -359,13 +265,13 @@ decorate = (api, md, slugCache, verbose) ->
       slugCache._nav = []
 
     for resource in resourceGroup.resources or []
-      # Element ID and link
+# Element ID and link
       resource.elementId = slugify(
         "#{resourceGroup.name}-#{resource.name}", true)
       resource.elementLink = "##{resource.elementId}"
 
       for action in resource.actions or []
-        # Element ID and link
+# Element ID and link
         action.elementId = slugify(
           "#{resourceGroup.name}-#{resource.name}-#{action.method}", true)
         action.elementLink = "##{action.elementId}"
@@ -443,9 +349,9 @@ decorate = (api, md, slugCache, verbose) ->
                         console.log(err)
 
               item.hasContent = item.description or \
-                                Object.keys(item.headers).length or \
-                                item.body or \
-                                item.schema
+                  Object.keys(item.headers).length or \
+                  item.body or \
+                  item.schema
 
               # If possible, make the body/schema pretty
               try
@@ -462,19 +368,31 @@ decorate = (api, md, slugCache, verbose) ->
 exports.getConfig = ->
   formats: ['1A']
   options: [
-    {name: 'variables',
-    description: 'Color scheme name or path to custom variables',
-    default: 'default'},
-    {name: 'condense-nav', description: 'Condense navigation links',
-    boolean: true, default: true},
-    {name: 'full-width', description: 'Use full window width',
-    boolean: true, default: false},
-    {name: 'template', description: 'Template name or path to custom template',
-    default: 'default'},
-    {name: 'style',
-    description: 'Layout style name or path to custom stylesheet'},
-    {name: 'emoji', description: 'Enable support for emoticons',
-    boolean: true, default: true}
+    {
+      name: 'variables',
+      description: 'Color scheme name or path to custom variables',
+      default: 'default'
+    },
+    {
+      name: 'condense-nav', description: 'Condense navigation links',
+      boolean: true, default: true
+    },
+    {
+      name: 'full-width', description: 'Use full window width',
+      boolean: true, default: false
+    },
+    {
+      name: 'template', description: 'Template name or path to custom template',
+      default: 'default'
+    },
+    {
+      name: 'style',
+      description: 'Layout style name or path to custom stylesheet'
+    },
+    {
+      name: 'emoji', description: 'Enable support for emoticons',
+      boolean: true, default: true
+    }
   ]
 
 # Render the blueprint with the given options using Jade and LESS
@@ -482,9 +400,6 @@ exports.render = (input, options, done) ->
   if not done?
     done = options
     options = {}
-
-  # Disable the template/css caching?
-  if process.env.NOCACHE then cache = {}
 
   # This is purely for backward-compatibility
   if options.condenseNav then options.themeCondenseNav = options.condenseNav
@@ -496,10 +411,14 @@ exports.render = (input, options, done) ->
   options.themeTemplate ?= 'default'
   options.themeCondenseNav ?= true
   options.themeFullWidth ?= false
+  options.themeDest ?= 'out'
 
   # Transform built-in layout names to paths
   if options.themeTemplate is 'default'
     options.themeTemplate = path.join ROOT, 'templates', 'index.jade'
+
+  if !path.isAbsolute options.themeDest
+    options.themeDest = path.normalize(path.join ROOT, '../..', options.themeDest)
 
   # Setup markdown with code highlighting and smartypants. This also enables
   # automatically inserting permalinks for headers.
@@ -531,36 +450,43 @@ exports.render = (input, options, done) ->
   benchmark.end 'decorate'
 
   benchmark.start 'css-total'
-  {themeVariables, themeStyle, verbose} = options
-  getCss themeVariables, themeStyle, verbose, (err, css) ->
-    if err then return done(errMsg 'Could not get CSS', err)
-    benchmark.end 'css-total'
+  { themeVariables, themeStyle, verbose } = options
 
-    locals =
-      api: input
-      condenseNav: options.themeCondenseNav
-      css: css
-      fullWidth: options.themeFullWidth
-      date: moment
-      hash: (value) ->
-        crypto.createHash('md5').update(value.toString()).digest('hex')
-      highlight: highlight
-      markdown: (content) -> md.render content
-      slug: slug.bind(slug, slugCache)
-      urldec: (value) -> querystring.unescape(value)
+  if not fs.existsSync options.themeDest
+    fs.mkdir options.themeDest, 0o755
 
-    for key, value of options.locals or {}
-      locals[key] = value
+  getFont options.themeDest, verbose, (err, css) ->
+    if err then return done(errMsg 'Could not proccess Font-Awesome', err)
 
-    benchmark.start 'get-template'
-    getTemplate options.themeTemplate, verbose, (getTemplateErr, renderer) ->
-      if getTemplateErr
-        return done(errMsg 'Could not get template', getTemplateErr)
-      benchmark.end 'get-template'
+    getCss options.themeDest, verbose, (err, css) ->
+      if err then return done(errMsg 'Could not get CSS', err)
+      benchmark.end 'css-total'
 
-      benchmark.start 'call-template'
-      try html = renderer locals
-      catch err
-        return done(errMsg 'Error calling template during rendering', err)
-      benchmark.end 'call-template'
-      done null, html
+      locals =
+        api: input
+        condenseNav: options.themeCondenseNav
+        css: css
+        fullWidth: options.themeFullWidth
+        date: moment
+        hash: (value) ->
+          crypto.createHash('md5').update(value.toString()).digest('hex')
+        highlight: highlight
+        markdown: (content) -> md.render content
+        slug: slug.bind(slug, slugCache)
+        urldec: (value) -> querystring.unescape(value)
+
+      for key, value of options.locals or {}
+        locals[key] = value
+
+      benchmark.start 'get-template'
+      getTemplate options.themeTemplate, verbose, (getTemplateErr, renderer) ->
+        if getTemplateErr
+          return done(errMsg 'Could not get template', getTemplateErr)
+        benchmark.end 'get-template'
+
+        benchmark.start 'call-template'
+        try html = renderer locals
+        catch err
+          return done(errMsg 'Error calling template during rendering', err)
+        benchmark.end 'call-template'
+        done null, html
