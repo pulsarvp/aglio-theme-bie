@@ -15,11 +15,14 @@ inherit = require './inherit'
 
 module.exports = renderSchema = (root, dataStructures) ->
   schema = {}
+
   switch root.element
     when 'boolean', 'string', 'number'
       schema.type = root.element
       if root.attributes?.default?
         schema.default = root.attributes.default
+      if root.content?
+        schema.example = root.content
     when 'enum'
       schema.type = 'enum'
       schema.enum = []
@@ -82,6 +85,9 @@ module.exports = renderSchema = (root, dataStructures) ->
       ref = dataStructures[root.element]
       if ref
         schema = renderSchema(inherit(ref, root), dataStructures)
+
+  if root.meta?.id?
+    schema.name = root.meta.id
 
   if root.meta?.description?
     schema.description = root.meta.description

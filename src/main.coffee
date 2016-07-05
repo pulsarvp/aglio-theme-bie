@@ -164,7 +164,11 @@ getTemplate = (name, verbose, done) ->
 
   # Check if it is compiled on disk and not older than the template file.
   # If not present or outdated, then we'll need to compile it.
-  compiledPath = path.join ROOT, 'js', "app.js"
+  dest = path.join ROOT, 'js'
+  if not fs.existsSync dest
+    fs.mkdir dest, 0o755
+
+  compiledPath = path.join dest, 'app.js'
 
   load = (filename, loadDone) ->
     try
@@ -370,9 +374,7 @@ decorate = (api, md, slugCache, verbose) ->
                 for dataStructure in item.content
                   if dataStructure.element is 'dataStructure'
                     try
-                      schema = renderSchema(dataStructure.content[0], dataStructures)
-                      console.log(schema)
-                      item.schema = JSON.stringify(schema, null, 2)
+                      item.schemaStructure = renderSchema(dataStructure.content[0], dataStructures)
                     catch err
                       if verbose
                         console.log(

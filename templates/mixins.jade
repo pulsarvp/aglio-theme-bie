@@ -1,258 +1,295 @@
 - var host = '[HOST]'
 
 mixin Nav(multipage, collapsible)
-	nav#nav.hidden-sm.hidden-xs.nav
-		if multipage
-			.list-group
-				a.list-group-item.heading(href="#") Home
-		each resourceGroup in api.resourceGroups
-			if (resourceGroup.name.search('Hidden') == -1)
-				.list-group
-					a.list-group-item.heading.collapsed(data-toggle="#{(collapsible ? 'collapse' : '')}", data-target="##{(multipage ? 'page:' : '') + slug(resourceGroup.name)}-menu", href="##{(multipage ? 'page:' : '') + slug(resourceGroup.name)}")
-						if collapsible && resourceGroup.resources.length
-							span.toggle.pull-right
-								span.open.fa.fa-angle-down
-								span.closed.fa.fa-angle-right
-						= resourceGroup.name || 'Resource Group'
-					div(class=collapsible ? 'collapse' : '', id="#{(multipage ? 'page:' : '') + slug(resourceGroup.name)}-menu")
-						each resource in resourceGroup.resources
-							if !condenseNav || (resource.actions.length != 1)
-								a.list-group-item(href="##{multipage ? 'page:' + slug(resourceGroup.name) + ',header:' : ''}#{slug(resourceGroup.name)}-#{slug(resource.name)}")
-									= resource.name || 'Resource'
-								each action in resource.actions
-									a.list-group-item(href="##{multipage ? 'page:' + slug(resourceGroup.name) + ',header:' : ''}#{slug(resourceGroup.name)}-#{slug(resource.name)}-#{slug(action.method)}")
-										+Icon(action.method)
-										span.indent
-											= action.name || action.method + ' ' + resource.uriTemplate
-							else
-								a.list-group-item(href="##{multipage ? 'page:' + slug(resourceGroup.name) + ',header:' : ''}#{slug(resourceGroup.name)}-#{slug(resource.name)}")
-									- var action = resource.actions[0]
-									+Icon(action.method)
-									= resource.name || action.name || action.method + ' ' + resource.uriTemplate
-		each meta in api.metadata
-			if meta.name == 'HOST'
-				p.host
-					- host = meta.value
-					a(href=meta.value)= meta.value
+    nav#nav.hidden-sm.hidden-xs.nav
+        if multipage
+            .list-group
+                a.list-group-item.heading(href="#") Home
+        each resourceGroup in api.resourceGroups
+            if (resourceGroup.name.search('Hidden') == -1)
+                .list-group
+                    a.list-group-item.heading.collapsed(data-toggle="#{(collapsible ? 'collapse' : '')}", data-target="##{(multipage ? 'page:' : '') + slug(resourceGroup.name)}-menu", href="##{(multipage ? 'page:' : '') + slug(resourceGroup.name)}")
+                        if collapsible && resourceGroup.resources.length
+                            span.toggle.pull-right
+                                span.open.fa.fa-angle-down
+                                span.closed.fa.fa-angle-right
+                        = resourceGroup.name || 'Resource Group'
+                    div(class=collapsible ? 'collapse' : '', id="#{(multipage ? 'page:' : '') + slug(resourceGroup.name)}-menu")
+                        each resource in resourceGroup.resources
+                            if !condenseNav || (resource.actions.length != 1)
+                                a.list-group-item(href="##{multipage ? 'page:' + slug(resourceGroup.name) + ',header:' : ''}#{slug(resourceGroup.name)}-#{slug(resource.name)}")
+                                    = resource.name || 'Resource'
+                                each action in resource.actions
+                                    a.list-group-item(href="##{multipage ? 'page:' + slug(resourceGroup.name) + ',header:' : ''}#{slug(resourceGroup.name)}-#{slug(resource.name)}-#{slug(action.method)}")
+                                        +Icon(action.method)
+                                        span.indent
+                                            = action.name || action.method + ' ' + resource.uriTemplate
+                            else
+                                a.list-group-item(href="##{multipage ? 'page:' + slug(resourceGroup.name) + ',header:' : ''}#{slug(resourceGroup.name)}-#{slug(resource.name)}")
+                                    - var action = resource.actions[0]
+                                    +Icon(action.method)
+                                    = resource.name || action.name || action.method + ' ' + resource.uriTemplate
+        each meta in api.metadata
+            if meta.name == 'HOST'
+                p.host
+                    - host = meta.value
+                    a(href=meta.value)= meta.value
 
 mixin Parameters(params)
-	table.table.table-striped.table-hover
-		thead
-			tr
-				th Name
-				th Type
-				th Default
-				th Required
-				th Description
-				th Example
-				th Values
-		tbody
-			each param in params
-				tr
-					td.name= param.name
-					td.type= param.type
-					td.default
-						if param.default
-							= param.default
-					td.required
-						if param.required
-							i.fa.fa-check
-					td.description!= markdown(param.description)
-					td.example
-						if param.example
-							= param.example
-					td.values
-						if param.values.length
-							ul.list-unstyled
-								each value in param.values
-									li= value.value
+    table.table.table-striped.table-hover
+        thead
+            tr
+                th Name
+                th Type
+                th Required
+                th Description
+                th Default
+                th Example
+                th Values
+        tbody
+            each param in params
+                tr
+                    td.name= param.name
+                    td.type= param.type
+                    td.required
+                        if param.required
+                            i.fa.fa-check
+                    td.description!= markdown(param.description)
+                    td.default
+                        if param.default
+                            = param.default
+                    td.example
+                        if param.example
+                            = param.example
+                    td.values
+                        if param.values.length
+                            ul.list-unstyled
+                                each value in param.values
+                                    li= value.value
+
+mixin SchemaTable (schema)
+    table.table.table-striped.table-hover
+        thead
+            tr
+                th Name
+                th Type
+                th Required
+                th Description
+                th Default
+                th Example
+                th Values
+        tbody
+            each item in schema.properties
+                tr
+                    td.name= item.name
+                    td.type= item.type
+                    td.required
+                        if item.required
+                            i.fa.fa-check
+                    td.description= item.description
+                    if item.type == 'object'
+                        if item.properties
+                            td(colspan='3')
+                                +SchemaTable(item)
+                    else
+                        td.default
+                            if item.default
+                                = item.default
+                        td.example= item.example
+                        td.values
+                            if item.enum && item.enum.length
+                                ul.list-unstyled
+                                    each value in item.enum
+                                        li= value
 
 mixin RequestResponse(title, request, resourceGroup, resource, action)
-	- var id = hash(resourceGroup.name.toString() + resource.name.toString() + action.name.toString() + action.method.toString() + title.toString() + request.name.toString() + request.headers.toString() + request.body.toString() + request.schema.toString())
-	- var content = request.description || Object.keys(request.headers).length || request.body || request.schema
+    - var id = hash(resourceGroup.name.toString() + resource.name.toString() + action.name.toString() + action.method.toString() + title.toString() + request.name.toString() + request.headers.toString() + request.body.toString() + request.schema.toString())
+    - var content = request.description || Object.keys(request.headers).length || request.body || request.schema
 
-	div(class=title.toLowerCase())
-		strong
-			= title
-			if request.name
-				| &nbsp;
-				code= request.name
-					- var text = ''
-					case request.name
-						when '200'
-							- var text = 'OK'
-						when '201'
-							- var text = 'Created'
-						when '400'
-							- var text = 'Bad Request'
-						when '401'
-							- var text = 'Unauthorized'
-						when '404'
-							- var text = 'Not Found'
-						when '422'
-							- var text = 'Unprocessable Entity'
-					if (text.length > 0)
-						= ' ' + text
-					- var status = false
-					each h in request.headers
-						if ( h.name == 'Status' )
-							- status = true
-					if (status == false)
-						- request.headers.unshift({ name : 'Status', value : request.name + ' ' + text });
-		if content
-			a.pull-right.collapsed(data-toggle="collapse", data-target="##{id}")
-				span.closed Show
-				span.open Hide
+    div(class=title.toLowerCase())
+        strong
+            = title
+            if request.name
+                | &nbsp;
+                code= request.name
+                - var text = ''
+                case request.name
+                    when '200'
+                        - var text = 'OK'
+                    when '201'
+                        - var text = 'Created'
+                    when '400'
+                        - var text = 'Bad Request'
+                    when '401'
+                        - var text = 'Unauthorized'
+                    when '404'
+                        - var text = 'Not Found'
+                    when '422'
+                        - var text = 'Unprocessable Entity'
+                if (text.length > 0)
+                    = ' ' + text
+                - var status = false
+                each h in request.headers
+                    if ( h.name == 'Status' )
+                        - status = true
+                if (status == false)
+                    - request.headers.unshift({ name : 'Status', value : request.name + ' ' + text });
+        if content
+            a.pull-right.collapsed(data-toggle="collapse", data-target="##{id}")
+                span.closed Show
+                span.open Hide
 
-		if content
-			div.collapse(id=id,class=title.toLowerCase()+'-content')
-				if request.description
-					.description!= markdown(request.description)
+        if content
+            div.collapse(id=id,class=title.toLowerCase() + '-content')
+                if request.description
+                    .description!= markdown(request.description)
 
-				if Object.keys(request.headers).length
-					h5 Headers
-					div.headers(id=id+'-headers')
-						pre
-							code
-								each item in request.headers
-									!= highlight(item.name + ': ' + item.value, 'http')
-									br
-				
-				if request.body
-					h5 Body
-					div.body(id=id+'-body')
-						pre
-							code!= highlight(request.body)
-				
-				if request.schema
-					h5 Schema
-					div.schema(id=id+'-schema')
-						pre
-							code!= highlight(request.schema)
+                if Object.keys(request.headers).length
+                    h5 Headers
+                    div.headers(id=id + '-headers')
+                        pre
+                            code
+                                each item in request.headers
+                                    != highlight(item.name + ': ' + item.value, 'http')
+                                    br
+
+                if request.body
+                    h5 Body
+                    div.body(id=id + '-body')
+                        pre
+                            code!= highlight(request.body)
+
+                if request.schemaStructure
+                    h5 Structure
+                    div.schema-structure
+                        +SchemaTable(request.schemaStructure)
+
+                if request.schema
+                    h5 Schema
+                    div.schema(id=id + '-schema')
+                        pre
+                            code!= highlight(request.schema)
 
 mixin Examples(resourceGroup, resource, action)
-	each example in action.examples
-		each request in example.requests
-			+RequestResponse('Request', request, resourceGroup, resource, action)
-		each response in example.responses
-			+RequestResponse('Response', response, resourceGroup, resource, action)
+    each example in action.examples
+        each request in example.requests
+            +RequestResponse('Request', request, resourceGroup, resource, action)
+        each response in example.responses
+            +RequestResponse('Response', response, resourceGroup, resource, action)
 
 mixin ResourceGroup(resourceGroup, getButtonClass, multipage)
-	h1(id="#{slug(resourceGroup.name)}").resource-group-heading
-		= resourceGroup.name || 'Resource Group'
-		| &nbsp;
-		a(href="##{multipage ? 'page:' : ''}#{slug(resourceGroup.name)}")
-			i.fa.fa-link
-	.resource-group-body
-		if resourceGroup.description
-			!= markdown(resourceGroup.description)
-		each resource in resourceGroup.resources
-			h2(id="#{slug(resourceGroup.name)}-#{slug(resource.name)}").resource-heading
-				= resource.name || 'Resources'
-				| &nbsp;
-				a(href="##{(multipage ? 'page:' + slug(resourceGroup.name) + ',header:' : '')}#{slug(resourceGroup.name)}-#{slug(resource.name)}")
-					i.fa.fa-link
-			if resource.description
-				!= markdown(resource.description)
-			each action in resource.actions
-				case action.method
-					when 'POST': - var actionClass = 'success'
-					when 'GET': - var actionClass = 'info'
-					when 'PUT': - var actionClass = 'warning'
-					when 'PATCH': - var actionClass = 'warning'
-					when 'DELETE': - var actionClass = 'danger'
-					default: - var actionClass = 'default'
-				section.resource-body(id="#{slug(resourceGroup.name)}-#{slug(resource.name)}-#{slug(action.method)}")
-					.action-heading(class=actionClass)
-						if action.name
-							div.pull-right.lowercase= action.name
-						case action.method
-							when 'POST': - var btnClass = 'btn-success'
-							when 'GET': - var btnClass = 'btn-' + getButtonClass
-							when 'PUT': - var btnClass = 'btn-warning'
-							when 'PATCH': - var btnClass = 'btn-warning'
-							when 'DELETE': - var btnClass = 'btn-danger'
-							default: - var btnClass = 'btn-default'
-						div.action-method
-							a.btn.btn-xs(class=btnClass, href="##{(multipage ? 'page:' + slug(resourceGroup.name) + ',header:' : '')}#{slug(resourceGroup.name)}-#{slug(resource.name)}-#{slug(action.method)}")= action.method
-						div.inline-block
-							code= decodeURI(resource.uriTemplate)
-					if action.description
-						.action-body!= markdown(action.description.replace('[HOST]', host))
+    h1(id="#{slug(resourceGroup.name)}").resource-group-heading
+        = resourceGroup.name || 'Resource Group'
+        | &nbsp;
+        a(href="##{multipage ? 'page:' : ''}#{slug(resourceGroup.name)}")
+            i.fa.fa-link
+    .resource-group-body
+        if resourceGroup.description
+            != markdown(resourceGroup.description)
+        each resource in resourceGroup.resources
+            h2(id="#{slug(resourceGroup.name)}-#{slug(resource.name)}").resource-heading
+                = resource.name || 'Resources'
+                | &nbsp;
+                a(href="##{(multipage ? 'page:' + slug(resourceGroup.name) + ',header:' : '')}#{slug(resourceGroup.name)}-#{slug(resource.name)}")
+                    i.fa.fa-link
+            if resource.description
+                != markdown(resource.description)
+            each action in resource.actions
+                case action.method
+                    when 'POST': - var actionClass = 'success'
+                    when 'GET': - var actionClass = 'info'
+                    when 'PUT': - var actionClass = 'warning'
+                    when 'PATCH': - var actionClass = 'warning'
+                    when 'DELETE': - var actionClass = 'danger'
+                    default: - var actionClass = 'default'
+                section.resource-body(id="#{slug(resourceGroup.name)}-#{slug(resource.name)}-#{slug(action.method)}")
+                    .action-heading(class=actionClass)
+                        if action.name
+                            div.pull-right.lowercase= action.name
+                        case action.method
+                            when 'POST': - var btnClass = 'btn-success'
+                            when 'GET': - var btnClass = 'btn-' + getButtonClass
+                            when 'PUT': - var btnClass = 'btn-warning'
+                            when 'PATCH': - var btnClass = 'btn-warning'
+                            when 'DELETE': - var btnClass = 'btn-danger'
+                            default: - var btnClass = 'btn-default'
+                        div.action-method
+                            a.btn.btn-xs(class=btnClass, href="##{(multipage ? 'page:' + slug(resourceGroup.name) + ',header:' : '')}#{slug(resourceGroup.name)}-#{slug(resource.name)}-#{slug(action.method)}")= action.method
+                        div.inline-block
+                            code= decodeURI(resource.uriTemplate)
+                    if action.description
+                        .action-body!= markdown(action.description.replace('[HOST]', host))
 
-					- var params = action.parameters.length ? action.parameters : resource.parameters
-					if params.length
-						.action-parameters
-							h4= 'Parameters'
-							+Parameters(params)
-					if action.examples
-						.action-examples
-							h4= 'Examples'
-							+Examples(resourceGroup, resource, action)
+                    - var params = action.parameters.length ? action.parameters : resource.parameters
+                    if params.length
+                        .action-parameters
+                            h4= 'Parameters'
+                            +Parameters(params)
+                    if action.examples
+                        .action-examples
+                            h4= 'Examples'
+                            +Examples(resourceGroup, resource, action)
 
 mixin Icon(method)
-	case method
-		when 'GET'
-			span.badge.alert-info
-				i.fa.fa-arrow-down
-		when 'POST'
-			span.badge.alert-success
-				i.fa.fa-plus
-		when 'PUT'
-			span.badge.alert-warning
-				i.fa.fa-pencil
-		when 'PATCH'
-			span.badge.alert-warning
-				i.fa.fa-pencil
-		when 'DELETE'
-			span.badge.alert-danger
-				i.fa.fa-times
-		default
-			span.badge
-				i.fa.fa-dot-circle-o
+    case method
+        when 'GET'
+            span.badge.alert-info
+                i.fa.fa-arrow-down
+        when 'POST'
+            span.badge.alert-success
+                i.fa.fa-plus
+        when 'PUT'
+            span.badge.alert-warning
+                i.fa.fa-pencil
+        when 'PATCH'
+            span.badge.alert-warning
+                i.fa.fa-pencil
+        when 'DELETE'
+            span.badge.alert-danger
+                i.fa.fa-times
+        default
+            span.badge
+                i.fa.fa-dot-circle-o
 
 mixin Content(getButtonClass, multipage)
-	h1= 'Introduction'
-	div(data-bind=multipage ? "visible: page() == 'home'" : undefined).description!= markdown(api.description)
+    h1= 'Introduction'
+    div(data-bind=multipage ? "visible: page() == 'home'" : undefined).description!= markdown(api.description)
 
-		if multipage
-			a.btn.btn-default.pull-right(href="#page:#{slug(api.resourceGroups[0].name)}")
-				| Next&nbsp;
-				i.fa.fa-arrow-circle-right
-			.clearfix
-			hr
+    if multipage
+        a.btn.btn-default.pull-right(href="#page:#{slug(api.resourceGroups[ 0 ].name)}")
+            | Next&nbsp;
+            i.fa.fa-arrow-circle-right
+        .clearfix
+        hr
 
-	each resourceGroup, index in api.resourceGroups
-		if (resourceGroup.name.search('Hidden') == -1)
-			+ResourceGroup(resourceGroup, getButtonClass, multipage)
+    each resourceGroup, index in api.resourceGroups
+        if (resourceGroup.name.search('Hidden') == -1)
+            +ResourceGroup(resourceGroup, getButtonClass, multipage)
 
 mixin Multipage()
-	//- Multi-page support through Knockout.js
-	script(src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.0.0/knockout-min.js")
-	script
-		:coffee
-			class App
-				constructor: ->
-					@page = ko.observable 'home'
+    //- Multi-page support through Knockout.js
+    script(src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.0.0/knockout-min.js")
+    script
+        :coffee
+            class App
+                constructor: ->
+                    @page = ko.observable 'home'
 
-			window.app = new App()
+            window.app = new App()
 
-			window.onhashchange = ->
-				vars = {}
-				for v in location.hash.substr(1).split(',')
-					parts = v.split ':'
-					vars[parts[0]] = parts[1]
+            window.onhashchange = ->
+                vars = {}
+                for v in location.hash.substr(1).split(',')
+                    parts = v.split ':'
+                    vars[parts[0]] = parts[1]
 
-				# Set the page
-				window.app.page vars.page or 'home'
+                # Set the page
+                window.app.page vars.page or 'home'
 
-				# Scroll to a header if Set
-				if vars.header
-					$("##{vars.header}")[0].scrollIntoView true
-				else
-					window.scrollTo 0, 0
+                # Scroll to a header if Set
+                if vars.header
+                    $("##{vars.header}")[0].scrollIntoView true
+                else
+                    window.scrollTo 0, 0
 
-			ko.applyBindings window.app
-
-			# Load the correct page
-			window.onhashchange()
+            ko.applyBindings window.app
