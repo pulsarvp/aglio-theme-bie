@@ -1,34 +1,7 @@
 - var host = '[HOST]'
 
-mixin Nav(multipage, collapsible)
+mixin Nav()
     nav#nav.hidden-sm.hidden-xs.nav
-        if multipage
-            .list-group
-                a.list-group-item.heading(href="#") Home
-        each resourceGroup in api.resourceGroups
-            if (resourceGroup.name.search('Hidden') == -1)
-                .list-group
-                    a.list-group-item.heading.collapsed(data-toggle="#{(collapsible ? 'collapse' : '')}", data-target="##{(multipage ? 'page:' : '') + slug(resourceGroup.name)}-menu", href="##{(multipage ? 'page:' : '') + slug(resourceGroup.name)}")
-                        if collapsible && resourceGroup.resources.length
-                            span.toggle.pull-right
-                                span.open.fa.fa-angle-down
-                                span.closed.fa.fa-angle-right
-                        = resourceGroup.name || 'Resource Group'
-                    div(class=collapsible ? 'collapse' : '', id="#{(multipage ? 'page:' : '') + slug(resourceGroup.name)}-menu")
-                        each resource in resourceGroup.resources
-                            if !condenseNav || (resource.actions.length != 1)
-                                a.list-group-item(href="##{multipage ? 'page:' + slug(resourceGroup.name) + ',header:' : ''}#{slug(resourceGroup.name)}-#{slug(resource.name)}")
-                                    = resource.name || 'Resource'
-                                each action in resource.actions
-                                    a.list-group-item(href="##{multipage ? 'page:' + slug(resourceGroup.name) + ',header:' : ''}#{slug(resourceGroup.name)}-#{slug(resource.name)}-#{slug(action.method)}")
-                                        +Icon(action.method)
-                                        span.indent
-                                            = action.name || action.method + ' ' + resource.uriTemplate
-                            else
-                                a.list-group-item(href="##{multipage ? 'page:' + slug(resourceGroup.name) + ',header:' : ''}#{slug(resourceGroup.name)}-#{slug(resource.name)}")
-                                    - var action = resource.actions[0]
-                                    +Icon(action.method)
-                                    = resource.name || action.name || action.method + ' ' + resource.uriTemplate
         each meta in api.metadata
             if meta.name == 'HOST'
                 p.host
@@ -177,11 +150,11 @@ mixin Examples(resourceGroup, resource, action)
         each response in example.responses
             +RequestResponse('Response', response, resourceGroup, resource, action)
 
-mixin ResourceGroup(resourceGroup, getButtonClass, multipage)
+mixin ResourceGroup(resourceGroup, getButtonClass)
     h1(id="#{slug(resourceGroup.name)}").resource-group-heading
         = resourceGroup.name || 'Resource Group'
         | &nbsp;
-        a(href="##{multipage ? 'page:' : ''}#{slug(resourceGroup.name)}")
+        a(href="###{slug(resourceGroup.name)}")
             i.fa.fa-link
     .resource-group-body
         if resourceGroup.description
@@ -190,7 +163,7 @@ mixin ResourceGroup(resourceGroup, getButtonClass, multipage)
             h2(id="#{slug(resourceGroup.name)}-#{slug(resource.name)}").resource-heading
                 = resource.name || 'Resources'
                 | &nbsp;
-                a(href="##{(multipage ? 'page:' + slug(resourceGroup.name) + ',header:' : '')}#{slug(resourceGroup.name)}-#{slug(resource.name)}")
+                a(href="###{slug(resourceGroup.name)}-#{slug(resource.name)}")
                     i.fa.fa-link
             if resource.description
                 != markdown(resource.description)
@@ -214,7 +187,7 @@ mixin ResourceGroup(resourceGroup, getButtonClass, multipage)
                             when 'DELETE': - var btnClass = 'btn-danger'
                             default: - var btnClass = 'btn-default'
                         div.action-method
-                            a.btn.btn-xs(class=btnClass, href="##{(multipage ? 'page:' + slug(resourceGroup.name) + ',header:' : '')}#{slug(resourceGroup.name)}-#{slug(resource.name)}-#{slug(action.method)}")= action.method
+                            a.btn.btn-xs(class=btnClass, href="###{slug(resourceGroup.name)}-#{slug(resource.name)}-#{slug(action.method)}")= action.method
                         div.inline-block
                             code= decodeURI(resource.uriTemplate)
                     if action.description
@@ -251,45 +224,10 @@ mixin Icon(method)
             span.badge
                 i.fa.fa-dot-circle-o
 
-mixin Content(getButtonClass, multipage)
+mixin Content(getButtonClass)
     h1= 'Introduction'
-    div(data-bind=multipage ? "visible: page() == 'home'" : undefined).description!= markdown(api.description)
-
-    if multipage
-        a.btn.btn-default.pull-right(href="#page:#{slug(api.resourceGroups[ 0 ].name)}")
-            | Next&nbsp;
-            i.fa.fa-arrow-circle-right
-        .clearfix
-        hr
+    div.description!= markdown(api.description)
 
     each resourceGroup, index in api.resourceGroups
         if (resourceGroup.name.search('Hidden') == -1)
-            +ResourceGroup(resourceGroup, getButtonClass, multipage)
-
-mixin Multipage()
-    //- Multi-page support through Knockout.js
-    script(src="//cdnjs.cloudflare.com/ajax/libs/knockout/3.0.0/knockout-min.js")
-    script
-        :coffee
-            class App
-                constructor: ->
-                    @page = ko.observable 'home'
-
-            window.app = new App()
-
-            window.onhashchange = ->
-                vars = {}
-                for v in location.hash.substr(1).split(',')
-                    parts = v.split ':'
-                    vars[parts[0]] = parts[1]
-
-                # Set the page
-                window.app.page vars.page or 'home'
-
-                # Scroll to a header if Set
-                if vars.header
-                    $("##{vars.header}")[0].scrollIntoView true
-                else
-                    window.scrollTo 0, 0
-
-            ko.applyBindings window.app
+            +ResourceGroup(resourceGroup, getButtonClass)
