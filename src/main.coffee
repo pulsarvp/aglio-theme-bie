@@ -97,7 +97,12 @@ getCss = (dest, verbose, done) ->
     done null, css
 
 getFont = (dest, verbose, done) ->
-  dest = path.join dest, 'font/fontawesome'
+  dest = path.join dest, 'font'
+
+  if not fs.existsSync dest
+    fs.mkdir dest, 0o755
+
+  dest = path.join dest, 'fontawesome'
 
   if not fs.existsSync dest
     fs.mkdir dest, 0o755
