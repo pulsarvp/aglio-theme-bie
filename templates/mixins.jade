@@ -134,14 +134,8 @@ mixin RequestResponse(title, request, resourceGroup, resource, action)
 
                 if request.schemaStructure
                     h5 Structure
-                    div.schema-structure
+                    div.schema-structure(id=id + '-structure')
                         +SchemaTable(request.schemaStructure)
-
-                if request.schema
-                    h5 Schema
-                    div.schema(id=id + '-schema')
-                        pre
-                            code!= highlight(request.schema)
 
 mixin Examples(resourceGroup, resource, action)
     each example in action.examples
