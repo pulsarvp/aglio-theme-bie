@@ -14,15 +14,15 @@ mixin Nav()
                     div(class=collapsible ? 'collapse' : '', id="#{slug(resourceGroup.name)}-menu")
                         each resource in resourceGroup.resources
                             if !condenseNav || (resource.actions.length != 1)
-                                a.list-group-item(href="###{slug(resourceGroup.name)}-#{slug(resource.name)}")
+                                a.list-group-item(href="##{slug(resourceGroup.name)}-#{slug(resource.name)}")
                                     = resource.name || 'Resource'
                                 each action in resource.actions
-                                    a.list-group-item(href="###{slug(resourceGroup.name)}-#{slug(resource.name)}-#{slug(action.method)}")
+                                    a.list-group-item(href="##slug(resourceGroup.name)}-#{slug(resource.name)}-#{slug(action.method)}")
                                         +Icon(action.method)
                                         span.indent
                                             = action.name || action.method + ' ' + resource.uriTemplate
                             else
-                                a.list-group-item(href="###{slug(resourceGroup.name)}-#{slug(resource.name)}")
+                                a.list-group-item(href="##{slug(resourceGroup.name)}-#{slug(resource.name)}")
                                     - var action = resource.actions[0]
                                     +Icon(action.method)
                                     = resource.name || action.name || action.method + ' ' + resource.uriTemplate
@@ -174,7 +174,7 @@ mixin ResourceGroup(resourceGroup, getButtonClass)
     h1(id="#{slug(resourceGroup.name)}").resource-group-heading
         = resourceGroup.name || 'Resource Group'
         | &nbsp;
-        a(href="###{slug(resourceGroup.name)}")
+        a(href="#{slug(resourceGroup.name)}")
             i.fa.fa-link
     .resource-group-body
         if resourceGroup.description
@@ -183,7 +183,7 @@ mixin ResourceGroup(resourceGroup, getButtonClass)
             h2(id="#{slug(resourceGroup.name)}-#{slug(resource.name)}").resource-heading
                 = resource.name || 'Resources'
                 | &nbsp;
-                a(href="###{slug(resourceGroup.name)}-#{slug(resource.name)}")
+                a(href="#{slug(resourceGroup.name)}-#{slug(resource.name)}")
                     i.fa.fa-link
             if resource.description
                 != markdown(resource.description)
@@ -207,7 +207,7 @@ mixin ResourceGroup(resourceGroup, getButtonClass)
                             when 'DELETE': - var btnClass = 'btn-danger'
                             default: - var btnClass = 'btn-default'
                         div.action-method
-                            a.btn.btn-xs(class=btnClass, href="###{slug(resourceGroup.name)}-#{slug(resource.name)}-#{slug(action.method)}")= action.method
+                            a.btn.btn-xs(class=btnClass, href="#{slug(resourceGroup.name)}-#{slug(resource.name)}-#{slug(action.method)}")= action.method
                         div.inline-block
                             code= decodeURI(resource.uriTemplate)
                     if action.description
