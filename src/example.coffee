@@ -21,7 +21,9 @@ module.exports = renderExample = (root, dataStructures) ->
   switch root.element
     when 'boolean', 'string', 'number'
       if root.content? then root.content else defaultValue(root.element)
-    when 'enum' then renderExample root.content[0], dataStructures
+    when 'enum'
+      if root.attributes?.samples?[0][0].content? then root.attributes.samples[0][0].content
+      else renderExample root.content[0], dataStructures
     when 'array'
       for item in root.content or []
         renderExample(item, dataStructures)
@@ -38,7 +40,7 @@ module.exports = renderExample = (root, dataStructures) ->
           properties.splice.apply properties, [i, 1].concat(ref.content)
           continue
         else if member.element == 'select'
-          # Note: we *always* select the first choice!
+# Note: we *always* select the first choice!
           member = member.content[0].content[0]
         key = member.content.key.content
         obj[key] = renderExample(member.content.value, dataStructures)

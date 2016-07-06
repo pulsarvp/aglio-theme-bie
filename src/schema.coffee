@@ -19,8 +19,6 @@ module.exports = renderSchema = (root, dataStructures) ->
   switch root.element
     when 'boolean', 'string', 'number'
       schema.type = root.element
-      if root.attributes?.default?
-        schema.default = root.attributes.default
       if root.content?
         schema.example = root.content
     when 'enum'
@@ -28,6 +26,8 @@ module.exports = renderSchema = (root, dataStructures) ->
       schema.enum = []
       for item in root.content or []
         schema.enum.push item.content
+      if root.attributes?.samples?[0][0].content?
+        schema.example = root.attributes.samples[0][0].content
     when 'array'
       schema.type = 'array'
       items = []
@@ -85,6 +85,9 @@ module.exports = renderSchema = (root, dataStructures) ->
       ref = dataStructures[root.element]
       if ref
         schema = renderSchema(inherit(ref, root), dataStructures)
+
+  if root.attributes?.default?
+    schema.default = root.attributes.default
 
   if root.meta?.id?
     schema.name = root.meta.id
