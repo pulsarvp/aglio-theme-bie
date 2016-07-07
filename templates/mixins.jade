@@ -108,16 +108,18 @@ mixin SchemaTable (schema)
                     td.required
                         if item.required
                             i.fa.fa-check
-                    td.description= item.description
                     case item.type
                         when 'object'
                             if item.properties
-                                td(colspan='3')
+                                td(colspan='4')
+                                    p= item.description
                                     +SchemaTable(item)
                         when 'array'
-                            td(colspan='3')
+                            td(colspan='4')
+                                p= item.description
                                 +SchemaTable(item.items)
                         default
+                            td.description= item.description
                             td.default
                                 if item.default
                                     = item.default
