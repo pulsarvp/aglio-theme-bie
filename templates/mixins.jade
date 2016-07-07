@@ -79,11 +79,7 @@ mixin SchemaTable (schema)
             tr
                 th Name
                 th Type
-
-                if attributeExists(schema.properties, 'required')
-                    th Required
-                else
-                    th(class='empty',title='Required') R…
+                th(class='empty',title='Required') R…
 
                 if attributeExists(schema.properties, 'description')
                     th Description
@@ -113,20 +109,24 @@ mixin SchemaTable (schema)
                         if item.required
                             i.fa.fa-check
                     td.description= item.description
-                    if item.type == 'object'
-                        if item.properties
+                    case item.type
+                        when 'object'
+                            if item.properties
+                                td(colspan='3')
+                                    +SchemaTable(item)
+                        when 'array'
                             td(colspan='3')
-                                +SchemaTable(item)
-                    else
-                        td.default
-                            if item.default
-                                = item.default
-                        td.example= item.example
-                        td.values
-                            if item.enum && item.enum.length
-                                ul.list-unstyled
-                                    each value in item.enum
-                                        li= value
+                                +SchemaTable(item.items)
+                        default
+                            td.default
+                                if item.default
+                                    = item.default
+                            td.example= item.example
+                            td.values
+                                if item.enum && item.enum.length
+                                    ul.list-unstyled
+                                        each value in item.enum
+                                            li= value
 
 mixin RequestResponse(title, request, resourceGroup, resource, action)
     - var id = hash(resourceGroup.name.toString() + resource.name.toString() + action.name.toString() + action.method.toString() + title.toString() + request.name.toString() + request.headers.toString() + request.body.toString() + request.schema.toString())

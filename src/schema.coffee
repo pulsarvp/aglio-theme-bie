@@ -41,6 +41,8 @@ module.exports = renderSchema = (root, dataStructures) ->
         catch
           schema.items =
             'anyOf': items
+      if (schema.items?.name?)
+        schema.type = 'array[' + schema.items.name + ']'
     when 'object', 'option'
       schema.type = 'object'
       schema.properties = {}
