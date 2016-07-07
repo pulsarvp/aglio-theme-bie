@@ -66,17 +66,44 @@ mixin Parameters(params)
                                 each value in param.values
                                     li= value.value
 
+- var attributeExists = function (properties, name) {
+-    for (var i in properties)
+-       if ((properties[i].hasOwnProperty(name) && properties[i][name].length) || properties[i].type == 'object' || properties[i].type == 'array')
+-           return true;
+-   return false;
+- }
+
 mixin SchemaTable (schema)
     table.table.table-striped.table-hover
         thead
             tr
                 th Name
                 th Type
-                th Required
-                th Description
-                th Default
-                th Example
-                th Values
+
+                if attributeExists(schema.properties, 'required')
+                    th Required
+                else
+                    th(class='empty',title='Required') R…
+
+                if attributeExists(schema.properties, 'description')
+                    th Description
+                else
+                    th(class='empty',title='Description') D…
+
+                if attributeExists(schema.properties, 'default')
+                    th Default
+                else
+                    th(class='empty',title='Default') D…
+
+                if attributeExists(schema.properties, 'example')
+                    th Example
+                else
+                    th(class='empty',title='Example') E…
+
+                if attributeExists(schema.properties, 'values')
+                    th Values
+                else
+                    th(class='empty',title='Values') V…
         tbody
             each item in schema.properties
                 tr
