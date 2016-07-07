@@ -42,9 +42,11 @@ module.exports = renderSchema = (root, dataStructures) ->
           schema.items =
             'anyOf': items
       if (schema.items?.name?)
-        schema.type = 'array[' + schema.items.name + ']'
+        schema.itemType = schema.items.name
     when 'object', 'option'
       schema.type = 'object'
+      if root.meta?.id?
+        schema.itemType = root.meta.id
       schema.properties = {}
       required = []
       properties = root.content.slice(0)

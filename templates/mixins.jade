@@ -117,7 +117,8 @@ mixin SchemaTable (schema)
                         when 'array'
                             td(colspan='4')
                                 p= item.description
-                                +SchemaTable(item.items)
+                                if (item.items.length)
+                                    +SchemaTable(item.items)
                         default
                             td.description= item.description
                             td.default
