@@ -105,9 +105,10 @@ mixin SchemaTable (schema)
                 tr
                     td.name= item.name
                     td.type
-
                         if item.type == 'array' && item.itemType
                             = 'array [ ' + item.itemType + ' ]'
+                        else if item.type == 'object' && item.itemType
+                            = 'object (' + item.itemType + ' )'
                         else
                             = item.type
                     td.required
