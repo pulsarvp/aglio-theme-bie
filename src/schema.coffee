@@ -13,6 +13,17 @@
 { deepEqual } = require 'assert'
 inherit = require './inherit'
 
+shouldAddStructure = (name, dataStructures, subStructure) ->
+  for i, item of subStructure
+    if i == name
+      return false
+
+  for i, item of dataStructures
+    if i == name
+      return true
+
+  return false
+
 module.exports = renderSchema = (root, dataStructures) ->
   schema = {}
 
@@ -105,5 +116,6 @@ module.exports = renderSchema = (root, dataStructures) ->
   if root.attributes?.typeAttributes
     typeAttr = root.attributes.typeAttributes
     if typeAttr.indexOf('nullable') isnt -1
-      schema.type = [schema.type, 'null']
+      schema.nullable = true
+
   schema
