@@ -81,30 +81,35 @@ mixin SchemaTable (schema)
                 th Type
                 th(class='empty',title='Required') R…
 
-                if attributeExists(schema.properties, 'description')
+                if attributeExists(schema, 'description')
                     th Description
                 else
                     th(class='empty',title='Description') D…
 
-                if attributeExists(schema.properties, 'default')
+                if attributeExists(schema, 'default')
                     th Default
                 else
                     th(class='empty',title='Default') D…
 
-                if attributeExists(schema.properties, 'example')
+                if attributeExists(schema, 'example')
                     th Example
                 else
                     th(class='empty',title='Example') E…
 
-                if attributeExists(schema.properties, 'values')
+                if attributeExists(schema, 'values')
                     th Values
                 else
                     th(class='empty',title='Values') V…
         tbody
-            each item in schema.properties
+            each item in schema
                 tr
                     td.name= item.name
-                    td.type= item.type
+                    td.type
+
+                        if item.type == 'array' && item.itemType
+                            = 'array [ ' + item.itemType + ' ]'
+                        else
+                            = item.type
                     td.required
                         if item.required
                             i.fa.fa-check
@@ -113,12 +118,12 @@ mixin SchemaTable (schema)
                             if item.properties
                                 td(colspan='4')
                                     p= item.description
-                                    +SchemaTable(item)
+                                    +SchemaTable(item.properties)
                         when 'array'
                             td(colspan='4')
                                 p= item.description
-                                if (item.items.length)
-                                    +SchemaTable(item.items)
+                                if (item.items.properties)
+                                    +SchemaTable(item.items.properties)
                         default
                             td.description= item.description
                             td.default
@@ -191,7 +196,7 @@ mixin RequestResponse(title, request, resourceGroup, resource, action)
                 if request.schemaStructure
                     h5 Structure
                     div.schema-structure(id=id + '-structure')
-                        +SchemaTable(request.schemaStructure)
+                        +SchemaTable(request.schemaStructure.properties)
 
 mixin Examples(resourceGroup, resource, action)
     each example in action.examples

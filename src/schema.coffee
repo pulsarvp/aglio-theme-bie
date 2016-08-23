@@ -30,6 +30,10 @@ module.exports = renderSchema = (root, dataStructures) ->
         schema.example = root.attributes.samples[0][0].content
     when 'array'
       schema.type = 'array'
+      if root.content?[0].element?
+        schema.itemType = root.content[0].element
+
+      # Get sub elements
       items = []
       for item in root.content or []
         items.push renderSchema(item, dataStructures)
@@ -40,9 +44,8 @@ module.exports = renderSchema = (root, dataStructures) ->
           schema.items = items.reduce (l, r) -> deepEqual(l, r) or r
         catch
           schema.items =
-            'anyOf': items
-      if (schema.items?.name?)
-        schema.itemType = schema.items.name
+            'properties': items
+
     when 'object', 'option'
       schema.type = 'object'
       if root.meta?.id?
