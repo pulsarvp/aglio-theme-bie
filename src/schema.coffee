@@ -85,7 +85,7 @@ module.exports = renderSchema = (root, dataStructures) ->
           if typeAttr.indexOf('required') isnt -1
             if required.indexOf(key) is -1 then required.push key
           if typeAttr.indexOf('nullable') isnt -1
-            schema.properties[key].type = [schema.properties[key].type, 'null']
+            schema.properties[key].nullable = true
       for name in required
         schema.properties[name].required = true
     else
