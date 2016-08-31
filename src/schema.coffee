@@ -105,5 +105,6 @@ module.exports = renderSchema = (root, dataStructures) ->
   if root.attributes?.typeAttributes
     typeAttr = root.attributes.typeAttributes
     if typeAttr.indexOf('nullable') isnt -1
-      schema.type = [schema.type, 'null']
+      schema.nullable = true
+
   schema

@@ -19,6 +19,24 @@ benchmark =
   start: (message) -> if process.env.BENCHMARK then console.time message
   end: (message) -> if process.env.BENCHMARK then console.timeEnd message
 
+schemaSubStructures = (schema) ->
+  structures = {}
+
+  if schema.properties?
+    properties = schema.properties
+  else if schema.items?.properties?
+    properties = schema.items.properties
+
+  if properties?
+    for name, item of properties
+      if item.itemType?
+        structures[item.itemType] = item
+        sub = schemaSubStructures(item)
+        for subName, subItem of sub
+          structures[subName] = subItem
+
+  structures
+
 # Extend an error's message. Returns the modified error.
 errMsg = (message, err) ->
   err.message = "#{message}: #{err.message}"
@@ -380,6 +398,7 @@ decorate = (api, md, slugCache, verbose) ->
                   if dataStructure.element is 'dataStructure'
                     try
                       item.schemaStructure = renderSchema(dataStructure.content[0], dataStructures)
+                      item.subStructures = schemaSubStructures (item.schemaStructure)
                     catch err
                       if verbose
                         console.log(
