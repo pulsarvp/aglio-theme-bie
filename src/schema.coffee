@@ -13,17 +13,6 @@
 { deepEqual } = require 'assert'
 inherit = require './inherit'
 
-shouldAddStructure = (name, dataStructures, subStructure) ->
-  for i, item of subStructure
-    if i == name
-      return false
-
-  for i, item of dataStructures
-    if i == name
-      return true
-
-  return false
-
 module.exports = renderSchema = (root, dataStructures) ->
   schema = {}
 
