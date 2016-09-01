@@ -131,7 +131,7 @@ mixin RequestResponse(title, request, resourceGroup, resource, action)
             = title
             if request.name
                 | &nbsp;
-                code= request.name
+                code(class='response-code-' + request.name)= request.name
                 - var text = ''
                 case request.name
                     when '200'
