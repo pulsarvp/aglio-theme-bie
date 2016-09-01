@@ -74,66 +74,49 @@ mixin Parameters(params)
 - }
 
 mixin SchemaTable (schema, baseId)
-    table.table.table-striped.table-hover
-        thead
+    thead
+        tr
+            th Name
+            th Type
+            th Required
+            th Null
+            th Description
+            th Default
+            th Example
+            th Values
+    tbody
+        each item in schema
             tr
-                th Name
-                th Type
-                th(class='empty',title='Required') R…
-                th Null
-
-                if attributeExists(schema, 'description')
-                    th Description
-                else
-                    th(class='empty',title='Description') D…
-
-                if attributeExists(schema, 'default')
-                    th Default
-                else
-                    th(class='empty',title='Default') D…
-
-                if attributeExists(schema, 'example')
-                    th Example
-                else
-                    th(class='empty',title='Example') E…
-
-                if attributeExists(schema, 'values')
-                    th Values
-                else
-                    th(class='empty',title='Values') V…
-        tbody
-            each item in schema
-                tr
-                    td.name= item.name
-                    td.type
-                        if item.type == 'array' && item.itemType
-                            - subId = baseId + item.itemType.replace(/\s+/g, '')
-                            = 'array [ '
-                            a(href='#' + subId)= item.itemType
-                            = ' ]'
-                        else if item.type == 'object' && item.itemType
-                            - subId = baseId + item.itemType.replace(/\s+/g, '')
-                            = 'object ( '
-                            a(href='#' + subId)= item.itemType
-                            = ' )'
-                        else
-                            = item.type
-                    td.required
-                        if item.required
-                            i.fa.fa-check
-                    td.null
-                        if item.nullable
-                            i.fa.fa-check
-                    td.description= item.description
-                    td.default
-                        if item.default
-                            = item.default
-                    td.example= item.example
-                    td.values
-                        if item.enum && item.enum.length
-                            ul.list-unstyled
-                                each value in item.enum
-                                    li= value
+                td.name= item.name
+                td.type
+                    if item.type == 'array' && item.itemType
+                        - subId = baseId + item.itemType.replace(/\s+/g, '')
+                        = 'array [ '
+                        a(href='#' + subId)= item.itemType
+                        = ' ]'
+                    else if item.type == 'object' && item.itemType
+                        - subId = baseId + item.itemType.replace(/\s+/g, '')
+                        = 'object ( '
+                        a(href='#' + subId)= item.itemType
+                        = ' )'
+                    else
+                        = item.type
+                td.required
+                    if item.required
+                        i.fa.fa-check
+                td.null
+                    if item.nullable
+                        i.fa.fa-check
+                td.description= item.description
+                td.default
+                    if item.default
+                        = item.default
+                td.example= item.example
+                td.values
+                    if item.enum && item.enum.length
+                        ul.list-unstyled
+                            each value in item.enum
+                                li= value
 
 mixin SchemaSubTable (schema, baseId)
     if schema.properties
@@ -201,13 +184,18 @@ mixin RequestResponse(title, request, resourceGroup, resource, action)
                 if request.schemaStructure
                     h4 Structure
                     div.schema-structure(id=id + '-structure')
-                        +SchemaTable(request.schemaStructure.properties, id + '-substructure-')
+                        table.table-schema.table.table-striped.table-hover
+                            +SchemaTable(request.schemaStructure.properties, id + '-substructure-')
                     if request.subStructures
+                        h4 Sub structures
                         div.schema-substructure
-                            each structure, name in request.subStructures
-                                - subId = name.replace(/\s+/g, '')
-                                h5(id=id + '-substructure-' + subId)= name
-                                +SchemaSubTable(structure, id + '-substructure-')
+                            table.table-schema.table.table-striped.table-hover.table-bordered
+                                each structure, name in request.subStructures
+                                    - subId = name.replace(/\s+/g, '')
+                                    thead
+                                        tr
+                                            th.schema-substructure-title(colspan=8,id=id + '-substructure-' + subId)= name
+                                    +SchemaSubTable(structure, id + '-substructure-')
 
 mixin Examples(resourceGroup, resource, action)
     each example in action.examples

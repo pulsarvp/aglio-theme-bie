@@ -331,6 +331,51 @@ pre
 			border-top: 1px solid @content-resource-heading-border-color;
 		}
 	}
+	.schema-substructure-title
+	{
+		background: #ecf8ff;
+		color: #000 !important;
+	}
+	.table-schema
+	{
+		th
+		{
+			color: #555;
+		}
+		.description
+		{
+			color: #000;
+		}
+		.example
+		{
+			font-style: italic;
+		}
+		.name
+		{
+			color: #0074d1;
+		}
+		.null, .required
+		{
+			color: #474747;
+			text-align: center;
+		}
+		.type
+		{
+			color: #bb51f0;
+			a
+			{
+				border-bottom: 1px dotted #8400d5;
+				color: #8400d5;
+				line-height: 70%;
+				text-decoration: none;
+				&:hover
+				{
+					color: #000;
+					border-bottom-color: #000;
+				}
+			}
+		}
+	}
 }
 
 .navigation
