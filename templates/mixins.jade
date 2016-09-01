@@ -108,9 +108,7 @@ mixin SchemaTable (schema, baseId)
                     if item.nullable
                         i.fa.fa-check
                 td.description= item.description
-                td.default
-                    if item.default
-                        = item.default
+                td.default= item.default
                 td.example= item.example
                 td.values
                     if item.enum && item.enum.length
