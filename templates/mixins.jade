@@ -75,7 +75,7 @@ mixin Parameters(params)
 
 mixin ItemSubType (baseId, item)
     - subId = baseId + item.itemType.replace(/\s+/g, '')
-    a(href='#' + subId)= item.itemType
+    a.schema-type-link(href='#' + subId)= item.itemType
 
 mixin ItemSubTypes (baseId, items)
     if items.itemType
@@ -146,6 +146,36 @@ mixin SchemaTable (schema, baseId)
                         ul.list-unstyled
                             each value in item.enum
                                 li= value
+
+mixin SchemaPopupTable (schema, baseId)
+    div.schema-popup(id=baseId)
+        table.table.table-condensed.table-schema
+            if schema.properties
+                +SchemaPopupSubTable(schema.properties, baseId)
+            else if schema.items.properties
+                +SchemaPopupSubTable(schema.items.properties, baseId)
+
+mixin SchemaPopupSubTable (schema, baseId)
+    thead
+        tr
+            th Name
+            th Type
+            th.text-center Required
+            th.text-center Null
+            th Description
+    tbody
+        each item in schema
+            tr
+                td.name= item.name
+                td.type
+                    +ItemType(baseId, item)
+                td.required
+                    if item.required
+                        i.fa.fa-check
+                td.null
+                    if item.nullable
+                        i.fa.fa-check
+                td.description= item.description
 
 mixin SchemaSubTable (schema, baseId)
     if schema.properties
@@ -218,15 +248,18 @@ mixin RequestResponse(title, request, resourceGroup, resource, action)
                     if request.subStructures
                         h4 Sub structures
                         div.schema-substructure
+                            - var keys = Object.keys(request.subStructures)
+                            - keys.sort()
                             table.table-schema.table.table-striped.table-hover.table-bordered
-                                - var keys = Object.keys(request.subStructures)
-                                - keys.sort()
                                 for name in keys
                                     - subId = name.replace(/\s+/g, '')
                                     thead
                                         tr
                                             th.schema-substructure-title(colspan=8,id=id + '-substructure-' + subId)= name
                                     +SchemaSubTable(request.subStructures[ name ], id + '-substructure-')
+                            for name in keys
+                                - subId = name.replace(/\s+/g, '')
+                                +SchemaPopupTable(request.subStructures[ name ], id + '-substructure-' + subId + '-popup')
 
 mixin Examples(resourceGroup, resource, action)
     each example in action.examples
