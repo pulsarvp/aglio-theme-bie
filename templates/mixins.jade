@@ -73,13 +73,53 @@ mixin Parameters(params)
 -   return false;
 - }
 
+mixin ItemSubType (baseId, item)
+    - subId = baseId + item.itemType.replace(/\s+/g, '')
+    a(href='#' + subId)= item.itemType
+
+mixin ItemSubTypes (baseId, items)
+    if items.itemType
+        +ItemSubType(baseId, items)
+    else
+        each item, i in items
+            if item.itemType
+                +ItemSubType(baseId, item)
+            else
+                = item.itemType
+            if (i < items.length - 1)
+                = ' | '
+
+mixin ItemType (baseId, item)
+    if item.type == 'array' && item.itemType
+        = 'array [ '
+        if item.items
+            if item.items.itemType
+                +ItemSubType(baseId, item.items)
+            else if item.items.properties
+                +ItemSubTypes(baseId, item.items.properties)
+        else
+            +ItemSubType(baseId, item)
+        = ' ]'
+    else if item.type == 'object' && item.itemType
+        = 'object ( '
+        if item.items
+            if item.items.itemType
+                +ItemSubType(baseId, item.items)
+            else if item.items.properties
+                +ItemSubTypes(baseId, item.items.properties)
+        else
+            +ItemSubType(baseId, item)
+        = ' )'
+    else
+        = item.type
+
 mixin SchemaTable (schema, baseId)
     thead
         tr
             th Name
             th Type
-            th Required
-            th Null
+            th.text-center Required
+            th.text-center Null
             th Description
             th Default
             th Example
@@ -89,18 +129,7 @@ mixin SchemaTable (schema, baseId)
             tr
                 td.name= item.name
                 td.type
-                    if item.type == 'array' && item.itemType
-                        - subId = baseId + item.itemType.replace(/\s+/g, '')
-                        = 'array [ '
-                        a(href='#' + subId)= item.itemType
-                        = ' ]'
-                    else if item.type == 'object' && item.itemType
-                        - subId = baseId + item.itemType.replace(/\s+/g, '')
-                        = 'object ( '
-                        a(href='#' + subId)= item.itemType
-                        = ' )'
-                    else
-                        = item.type
+                    +ItemType(baseId, item)
                 td.required
                     if item.required
                         i.fa.fa-check
