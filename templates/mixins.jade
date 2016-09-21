@@ -97,6 +97,8 @@ mixin ItemType (baseId, item)
                 +ItemSubType(baseId, item.items)
             else if item.items.properties
                 +ItemSubTypes(baseId, item.items.properties)
+            else
+                = item.items.type
         else
             +ItemSubType(baseId, item)
         = ' ]'
