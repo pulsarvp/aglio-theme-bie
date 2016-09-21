@@ -29,7 +29,7 @@ schemaSubStructures = (schema) ->
 
   if properties?
     for name, item of properties
-      if item.itemType?
+      if item.itemType? && item.itemType not in ['string', 'number', 'object', 'enum', 'boolean', 'option']
         structures[item.itemType] = item
         sub = schemaSubStructures(item)
         for subName, subItem of sub
