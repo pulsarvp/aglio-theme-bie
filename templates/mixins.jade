@@ -235,8 +235,14 @@ mixin RequestResponse(title, request, resourceGroup, resource, action)
                                     br
 
                 if request.body
+                    a.pull-right.collapsed(data-toggle="collapse", data-target="##{id + '-body'}")
+                        span.closed Show
+                        span.open Hide
+
+                if request.body
                     h5 Body
-                    div.body(id=id + '-body')
+
+                    div.body.collapse(id=id + '-body')
                         pre
                             code!= highlight(request.body)
 
