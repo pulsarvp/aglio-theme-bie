@@ -63,66 +63,9 @@ pre
 	border-top-right-radius: 3px;
 }
 
-.panel
+.code
 {
-	overflow: hidden;
-}
-
-.panel-heading
-{
-	code
-	{
-		margin-left: 3px;
-		color: @heading-code-text-color;
-		background-color: @heading-code-background-color;
-		white-space: pre-wrap;
-		word-wrap: break-word;
-	}
-	h3
-	{
-		margin-top: 10px;
-		margin-bottom: 10px;
-	}
-}
-
-.indent
-{
-	display: block;
-	text-indent: 16px;
-}
-
-.inline-block
-{
-	display: inline-block;
-}
-
-.list-group
-{
-	a
-	{
-		border-left: none !important;
-		border-right: none !important;
-	}
-
-}
-
-.list-group-item
-{
-	padding-left: @line-height-computed;
-	padding-right: @line-height-computed;
-	&.collapse
-	{
-		display: none;
-		&.in
-		{
-			display: block;
-		}
-	}
-}
-
-.lowercase
-{
-	text-transform: lowercase;
+	font-family: monospace;
 }
 
 .content
@@ -130,284 +73,112 @@ pre
 	display: table-cell;
 	padding-left: @nav-width;
 	vertical-align: top;
-	& > *
+	h1, h2, h3, h4, h5
 	{
+		font-weight: normal;
+		line-height: 150%;
 		margin: 0;
-		padding: @line-height-computed;
+		padding: 0;
 	}
 	h1
 	{
-		background: @content-h1-background-color;
-		border-bottom: 1px solid @content-h1-border-color;
-		font-size: floor(@font-size-base * 1.6);
-		line-height: 100%;
-		&:not(:first-child)
-		{
-			border-top: 1px solid @content-h1-border-color;
-		}
+		font-size: @font-size-base * 2.0;
+	}
+	h2
+	{
+		font-size: @font-size-base * 1.7;
+	}
+	h3
+	{
+		font-size: @font-size-base * 1.4;
+	}
+	h4
+	{
+		font-size: @font-size-base * 1.1;
 	}
 	.action-body
 	{
-		padding: @line-height-computed;
-		pre
-		{
-			background: @content-action-body-background-color;
-			border: none;
-			color: @content-action-body-text-color;
-			padding: @line-height-computed/2 @line-height-computed;
-		}
-	}
-	.action-examples
-	{
-		padding: @line-height-computed/2 @line-height-computed;
-		h4
-		{
-			font-size: floor(@font-size-base * 1.4);
-			line-height: 100%;
-			margin: 0 0 @line-height-computed/2 0;
-		}
+
 	}
 	.action-heading
 	{
-		padding: @line-height-computed/2 @line-height-computed;
-		code
-		{
-			background: @content-action-heading-code-background-color;
-			color: @content-action-heading-code-text-color;
-		}
-		&.danger
-		{
-			.action-heading-variant(@panel-danger-heading-bg, @panel-danger-border, @panel-danger-text);
-		}
-		&.default
-		{
-			.action-heading-variant(@panel-default-heading-bg, @panel-default-border, @panel-default-text);
-		}
-		&.info
-		{
-			.action-heading-variant(@panel-info-heading-bg, @panel-info-border, @panel-info-text);
-		}
-		&.primary
-		{
-			.action-heading-variant(@panel-primary-heading-bg, @panel-primary-border, @panel-primary-text);
-		}
-		&.success
-		{
-			.action-heading-variant(@panel-success-heading-bg, @panel-success-border, @panel-success-text);
-		}
-		&.warning
-		{
-			.action-heading-variant(@panel-warning-heading-bg, @panel-warning-border, @panel-warning-text);
-		}
+		margin-bottom: @line-height-computed;
 	}
-	.action-parameters
+	.action-pattern
 	{
-		padding: @line-height-computed/2 @line-height-computed;
-		h4
-		{
-			font-size: floor(@font-size-base * 1.4);
-			line-height: 100%;
-			margin: 0 0 @line-height-computed/2 0;
-		}
-		table
-		{
-			width: auto;
-			th
-			{
-				color: @content-action-parameters-table-th-color;
-				font-weight: normal;
-			}
-		}
-		.default, .required
-		{
-			text-align: center;
-		}
-		.example
-		{
-			color: @content-action-parameters-example-color;
-		}
-		.name
-		{
-			font-weight: bold;
-		}
+		margin-right: 30px;
 	}
-	.response, .request
+	.introduction
 	{
-		padding: @line-height-computed 0;
-		&.collapsed
+		border-bottom: 5px solid @content-resource-group-border-color;
+		h1
 		{
-			.toggle
-			{
-				.open
-				{
-					display: none;
-				}
-				.closed
-				{
-					display: block;
-				}
-			}
+			background: #6969b3;
+			border-bottom: 1px solid #6969b3;
+			padding: 0 @content-padding-side;
 		}
-		a
+		.description
 		{
-			span.closed
-			{
-				display: none;
-			}
-			span.open
-			{
-				display: block;
-			}
-			&.collapsed
-			{
-				span.closed
-				{
-					display: block;
-				}
-				span.open
-				{
-					display: none;
-				}
-			}
-		}
-		pre
-		{
-			background: @content-reponse-pre-background-color;
-			border: none;
-			color: @content-reponse-pre-text-color;
-			padding: @line-height-computed/2 @line-height-computed;
-		}
-		.toggle
-		{
-			.open
-			{
-				display: block;
-			}
-			.closed
-			{
-				display: none;
-			}
-		}
-		.response-content
-		{
-			// margin: 0 -@line-height-computed @line-height-computed/2 -@line-height-computed;
-			h5
-			{
-				font-weight: bold;
-				// padding: 0 @line-height-computed;
-			}
+			padding: @content-padding-side;
 		}
 	}
 	.resource-body
 	{
-		.action-method
+		border-left: 1px solid @content-resource-body-heading-background-color;
+		padding: 10px 0 0 20px;
+		&:not(:last-child)
 		{
-			display: inline-block;
-			margin-right: @line-height-computed / 2;
+			margin-bottom: 20px;
 		}
-		.panel-body
-		{
-			padding: @line-height-computed;
-		}
-		.panel-heading
-		{
-			padding: @line-height-computed;
-		}
+	}
+	.resource-group
+	{
+		border-bottom: 5px solid @content-resource-group-border-color;
+		padding: @content-padding-side;
+		//.label
+		//{
+		//	border-radius: 2px;
+		//	display: inline-block;
+		//	font-weight: normal;
+		//	line-height: 150%;
+		//	margin-left: 10px;
+		//	padding: 0 10px;
+		//
+		//	&:not(:last-child)
+		//	{
+		//		margin-right: 10px;
+		//	}
+		//}
+		//.label-group
+		//{
+		//	.resource-group-label(@content-resource-label-group-color);
+		//}
+		//.label-request
+		//{
+		//	.resource-group-label(@content-resource-label-request-color);
+		//}
 	}
 	.resource-group-body
 	{
-		padding: 0;
-	}
-	.resource-heading
-	{
-		background: @content-resource-heading-background-color;
-		border-bottom: 1px solid @content-resource-heading-border-color;
-		font-size: floor(@font-size-base * 1.3);
-		line-height: 100%;
-		margin: 0;
-		padding: @line-height-computed;
-		&:not(:first-child)
+		border-left: 1px solid @content-resource-heading-background-color;
+		padding: 10px 0 0 20px;
+		h2
 		{
-			border-top: 1px solid @content-resource-heading-border-color;
-		}
-	}
-	.response-code-200, .response-code-201
-	{
-		background: #dff0d8;
-		color: #3c763d;
-	}
-	.response-code-400, .response-code-401, .response-code-404, .response-code-422
-	{
-		background: #f2dede;
-		color: #a94442;
-	}
-	.schema-popup
-	{
-		box-shadow: 0px 0px 15px 5px #b8cbb8;
-		background: #f5f5f5;
-		display: none;
-		padding: 10px;
-		position: absolute;
-		table
-		{
-			margin-bottom: 0;
-			width: auto;
-		}
-		&.active
-		{
-			display: block !important;
-		}
-	}
-	.schema-substructure-title
-	{
-		background: #d9edf7;
-		color: #31708f !important;
-	}
-	.table-schema
-	{
-		th
-		{
-			color: #555;
-		}
-		.description
-		{
-			color: #000;
-		}
-		.example
-		{
-			font-style: italic;
-		}
-		.name
-		{
-			color: #0074d1;
-		}
-		.null, .required
-		{
-			color: #474747;
-			text-align: center;
-		}
-		.type
-		{
-			color: #bb51f0;
-			a
+			span
 			{
-				border-bottom: 1px dotted #8400d5;
-				color: #8400d5;
-				line-height: 70%;
-				text-decoration: none;
-				&:hover
-				{
-					color: #000;
-					border-bottom-color: #000;
-				}
+				background: @content-resource-body-heading-background-color;
+				color: #fff;
+				padding: 6px 9px;
 			}
 		}
-		.values
+	}
+	.resource-group-heading
+	{
+		span
 		{
-			ul
-			{
-				margin-bottom: 0;
-			}
+			background: @content-resource-heading-background-color;
+			color: #fff;
+			padding: 7px 10px;
 		}
 	}
 }
@@ -427,6 +198,7 @@ pre
 		background: @navigation-h1-background-color;
 		color: @navigation-h1-text-color;
 		font-size: floor(@font-size-base * 1.6);
+		font-weight: normal;
 		line-height: 100%;
 		margin: 0;
 		padding: @line-height-computed;
@@ -445,20 +217,32 @@ pre
 		text-align: center;
 		word-wrap: break-word;
 	}
+	.list-group
+	{
+		margin-bottom: 0;
+	}
 	.list-group-item
 	{
 		background: transparent;
 		border-color: @navigation-list-border-color;
+		border-left: none;
+		border-right: none;
 		color: @navigation-list-text-color;
 		&:hover
 		{
 			background: @navigation-list-background-color-hover;
 			color: @navigation-list-text-color-hover;
 		}
+		&:last-child
+		{
+			border-bottom: none;
+		}
 		&.heading
 		{
 			background: @navigation-list-heading-background-color;
 			border: 1px solid @navigation-list-heading-border-color;
+			border-left: none;
+			border-right: none;
 			color: @navigation-list-heading-text-color;
 			font-size: floor(@font-size-base * 1.3);
 			&:hover

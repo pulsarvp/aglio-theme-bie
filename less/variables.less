@@ -1,26 +1,20 @@
-@back-to-top-background-color: #eee;
+@back-to-top-background-color: rgba(238, 238, 238, 0.8);
 @back-to-top-border-color: rgba(0, 0, 0, 0.1);
 
 @code-background-color: #ddd;
 @code-text-color: #444;
 
-@content-action-body-background-color: #3f3f3f;
-@content-action-body-text-color: #dcdcdc;
-
-@content-action-heading-code-background-color: #f9f2f4;
-@content-action-heading-code-text-color: #c7254e;
-
-@content-action-parameters-table-th-color: #777;
-@content-action-parameters-example-color: #555;
-
-@content-h1-background-color: #e0e0e0;
-@content-h1-border-color: #ccc;
-
 @content-reponse-pre-background-color: #3f3f3f;
 @content-reponse-pre-text-color: #dcdcdc;
 
-@content-resource-heading-background-color: #eee;
-@content-resource-heading-border-color: #ddd;
+@content-resource-body-heading-background-color: #84afe6;
+@content-resource-group-border-color: #ccc;
+@content-resource-heading-background-color: #8ac6d0;
+
+@content-resource-label-group-color: #c7254e;
+@content-resource-label-request-color: #7a82ab;
+
+@content-padding-side: 20px;
 
 @content-schema-structure-background-color: @content-reponse-pre-background-color;
 @content-schema-structure-text-color: #fff;
@@ -36,23 +30,25 @@
 @heading-code-background-color: rgba(255, 255, 255, 0.7);
 @heading-code-text-color: #c7254e;
 
-@navigation-background-color: #333;
-@navigation-text-color: #eee;
+@navigation-background-color: #2f4858;
+@navigation-text-color: #fff;
 
-@navigation-h1-background-color: #ff9000;
-@navigation-h1-text-color: #000;
+@navigation-h1-background-color: #ed7d3a;
+@navigation-h1-text-color: #fff;
 
 @navigation-host-a-text-color: lighten(@brand-primary, 30%);
 @navigation-host-a-text-color-hover: lighten(@brand-primary, 20%);
 
-@navigation-list-background-color-hover: #000;
+@navigation-list-background-color-hover: darken(@navigation-background-color, 10%);
 @navigation-list-border-color: rgba(100, 100, 100, 0.5);
 @navigation-list-text-color: #eee;
 @navigation-list-text-color-hover: #fff;
 
-@navigation-list-heading-background-color: @brand-primary;
-@navigation-list-heading-background-color-hover: darken(@brand-primary, 10%);
-@navigation-list-heading-border-color: darken(@brand-primary, 10%);
+@navigation-list-heading-background-color: @navigation-primary-color;
+@navigation-list-heading-background-color-hover: darken(@navigation-primary-color, 10%);
+@navigation-list-heading-border-color: darken(@navigation-primary-color, 10%);
 @navigation-list-heading-text-color: #eee;
+
+@navigation-primary-color: #33658a;
 
 @nav-width: 280px;

@@ -275,57 +275,60 @@ mixin Examples(resourceGroup, resource, action)
             +RequestResponse('Response', response, resourceGroup, resource, action)
 
 mixin ResourceGroup(resourceGroup, getButtonClass)
-    h1(id="#{slug(resourceGroup.name)}").resource-group-heading
-        = resourceGroup.name || 'Resource Group'
-        | &nbsp;
-        a(href="#{slug(resourceGroup.name)}")
-            i.fa.fa-link
-    .resource-group-body
-        if resourceGroup.description
-            != markdown(resourceGroup.description)
-        each resource in resourceGroup.resources
-            h2(id="#{slug(resourceGroup.name)}-#{slug(resource.name)}").resource-heading
-                = resource.name || 'Resources'
-                | &nbsp;
-                a(href="#{slug(resourceGroup.name)}-#{slug(resource.name)}")
-                    i.fa.fa-link
-            if resource.description
-                != markdown(resource.description)
-            each action in resource.actions
-                case action.method
-                    when 'POST': - var actionClass = 'success'
-                    when 'GET': - var actionClass = 'info'
-                    when 'PUT': - var actionClass = 'warning'
-                    when 'PATCH': - var actionClass = 'warning'
-                    when 'DELETE': - var actionClass = 'danger'
-                    default: - var actionClass = 'default'
-                section.resource-body(id="#{slug(resourceGroup.name)}-#{slug(resource.name)}-#{slug(action.method)}")
-                    .action-heading(class=actionClass)
-                        if action.name
-                            div.pull-right.lowercase= action.name
-                        case action.method
-                            when 'POST': - var btnClass = 'btn-success'
-                            when 'GET': - var btnClass = 'btn-' + getButtonClass
-                            when 'PUT': - var btnClass = 'btn-warning'
-                            when 'PATCH': - var btnClass = 'btn-warning'
-                            when 'DELETE': - var btnClass = 'btn-danger'
-                            default: - var btnClass = 'btn-default'
-                        div.action-method
-                            a.btn.btn-xs(class=btnClass, href="#{slug(resourceGroup.name)}-#{slug(resource.name)}-#{slug(action.method)}")= action.method
-                        div.inline-block
-                            code= decodeURI(resource.uriTemplate)
-                    if action.description
-                        .action-body!= markdown(action.description.replace('[HOST]', host))
+    .resource-group
+        h1(id="#{slug(resourceGroup.name)}").resource-group-heading
+            span
+                = resourceGroup.name || 'Resource Group'
+            | &nbsp;
+            a(href="#{slug(resourceGroup.name)}")
+                i.fa.fa-link
+        .resource-group-body
+            if resourceGroup.description
+                != markdown(resourceGroup.description)
+            each resource in resourceGroup.resources
+                h2(id="#{slug(resourceGroup.name)}-#{slug(resource.name)}").resource-heading
+                    span
+                        = resource.name || 'Resources'
+                    | &nbsp;
+                    a(href="#{slug(resourceGroup.name)}-#{slug(resource.name)}")
+                        i.fa.fa-link
+                if resource.description
+                    != markdown(resource.description)
+                each action in resource.actions
+                    case action.method
+                        when 'POST': - var actionClass = 'success'
+                        when 'GET': - var actionClass = 'info'
+                        when 'PUT': - var actionClass = 'warning'
+                        when 'PATCH': - var actionClass = 'warning'
+                        when 'DELETE': - var actionClass = 'danger'
+                        default: - var actionClass = 'default'
+                    section.resource-body(id="#{slug(resourceGroup.name)}-#{slug(resource.name)}-#{slug(action.method)}")
+                        .action-heading(class=actionClass)
+                            case action.method
+                                when 'POST': - var btnClass = 'btn-success'
+                                when 'GET': - var btnClass = 'btn-' + getButtonClass
+                                when 'PUT': - var btnClass = 'btn-warning'
+                                when 'PATCH': - var btnClass = 'btn-warning'
+                                when 'DELETE': - var btnClass = 'btn-danger'
+                                default: - var btnClass = 'btn-default'
+                            .btn-group.action-pattern
+                                a.btn(class=btnClass, href="##{slug(resourceGroup.name)}-#{slug(resource.name)}-#{slug(action.method)}")= action.method
+                                code.btn.btn-default= decodeURI(resource.uriTemplate)
 
-                    - var params = action.parameters.length ? action.parameters : resource.parameters
-                    if params.length
-                        .action-parameters
-                            h4= 'Parameters'
-                            +Parameters(params)
-                    if action.examples
-                        .action-examples
-                            h4= 'Examples'
-                            +Examples(resourceGroup, resource, action)
+                            if action.description
+                                .btn-group
+                                    .btn.btn-default= 'Example'
+                                    .btn.btn-default.code!= action.description.replace('[HOST]', host)
+
+                        - var params = action.parameters.length ? action.parameters : resource.parameters
+                        if params.length
+                            .action-parameters
+                                h3= 'Parameters'
+                                +Parameters(params)
+                        if action.examples
+                            .action-examples
+                                h3= 'Responses'
+                                +Examples(resourceGroup, resource, action)
 
 mixin Icon(method)
     case method
@@ -349,8 +352,9 @@ mixin Icon(method)
                 i.fa.fa-dot-circle-o
 
 mixin Content(getButtonClass)
-    h1= 'Introduction'
-    div.description!= markdown(api.description)
+    .introduction
+        h1= 'Introduction'
+        div.description!= markdown(api.description)
 
     each resourceGroup, index in api.resourceGroups
         if (resourceGroup.name.search('Hidden') == -1)
