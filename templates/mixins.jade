@@ -215,7 +215,7 @@ mixin RequestResponse(title, request, resourceGroup, resource, action)
                 if (status == false)
                     - request.headers.unshift({ name : 'Status', value : request.name + ' ' + text });
         if content
-            a.collapsed(data-toggle="collapse", data-target="##{id}")
+            a.collapsed.response-show.btn.btn-sm.btn-default(data-toggle="collapse", data-target="##{id}")
                 span.closed Show
                 span.open Hide
 
@@ -248,7 +248,7 @@ mixin RequestResponse(title, request, resourceGroup, resource, action)
                             div.body
                                 pre
                                     code!= highlight(request.body)
-                        
+
                     if request.schemaStructure
                         .tab-pane.active(role="tabpanel",id=id + "-structure")
                             div.schema-structure

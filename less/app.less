@@ -104,6 +104,30 @@ pre
 	{
 		margin-bottom: @line-height-computed;
 	}
+	.action-parameters
+	{
+		table
+		{
+			th
+			{
+				color: @content-action-parameters-table-th-color;
+				font-weight: normal;
+			}
+		}
+		.default, .required
+		{
+			text-align: center;
+		}
+		.example
+		{
+			color: @content-action-parameters-example-color;
+			font-style: italic;
+		}
+		.name
+		{
+			font-weight: bold;
+		}
+	}
 	.action-pattern
 	{
 		margin-right: 30px;
@@ -126,10 +150,6 @@ pre
 	{
 		border-left: 1px solid @content-resource-body-heading-background-color;
 		padding: 10px 0 0 20px;
-		&:hover
-		{
-			background: lighten(@content-resource-body-heading-background-color, 26%);
-		}
 		&:not(:last-child)
 		{
 			margin-bottom: 20px;
@@ -139,28 +159,6 @@ pre
 	{
 		border-bottom: 5px solid @content-resource-group-border-color;
 		padding: @content-padding-side;
-		//.label
-		//{
-		//	border-radius: 2px;
-		//	display: inline-block;
-		//	font-weight: normal;
-		//	line-height: 150%;
-		//	margin-left: 10px;
-		//	padding: 0 10px;
-		//
-		//	&:not(:last-child)
-		//	{
-		//		margin-right: 10px;
-		//	}
-		//}
-		//.label-group
-		//{
-		//	.resource-group-label(@content-resource-label-group-color);
-		//}
-		//.label-request
-		//{
-		//	.resource-group-label(@content-resource-label-request-color);
-		//}
 	}
 	.resource-group-body
 	{
@@ -253,6 +251,29 @@ pre
 		background: #f2dede;
 		color: #a94442;
 	}
+	.response-content
+	{
+		padding-top: 15px;
+		.nav-pills
+		{
+			a
+			{
+				background: #e4f2fe;
+			}
+			.active
+			{
+				a
+				{
+					background: #337ab7;
+				}
+			}
+		}
+	}
+	.response-show
+	{
+		display: inline-block;
+		margin-left: 20px;
+	}
 	.schema-popup
 	{
 		box-shadow: 0px 0px 15px 5px #b8cbb8;
@@ -268,6 +289,58 @@ pre
 		&.active
 		{
 			display: block !important;
+		}
+	}
+	.schema-substructure-title
+	{
+		background: #d9edf7;
+		color: #31708f !important;
+	}
+	.table-schema
+	{
+		th
+		{
+			color: #555;
+		}
+		.description
+		{
+			color: #000;
+		}
+		.example
+		{
+			font-style: italic;
+		}
+		.name
+		{
+			color: #0074d1;
+		}
+		.null, .required
+		{
+			color: #474747;
+			text-align: center;
+		}
+		.type
+		{
+			color: #bb51f0;
+			a
+			{
+				border-bottom: 1px dotted #8400d5;
+				color: #8400d5;
+				line-height: 70%;
+				text-decoration: none;
+				&:hover
+				{
+					color: #000;
+					border-bottom-color: #000;
+				}
+			}
+		}
+		.values
+		{
+			ul
+			{
+				margin-bottom: 0;
+			}
 		}
 	}
 }
