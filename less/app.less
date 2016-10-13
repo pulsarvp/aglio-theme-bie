@@ -126,6 +126,10 @@ pre
 	{
 		border-left: 1px solid @content-resource-body-heading-background-color;
 		padding: 10px 0 0 20px;
+		&:hover
+		{
+			background: lighten(@content-resource-body-heading-background-color, 26%);
+		}
 		&:not(:last-child)
 		{
 			margin-bottom: 20px;
@@ -179,6 +183,91 @@ pre
 			background: @content-resource-heading-background-color;
 			color: #fff;
 			padding: 7px 10px;
+		}
+	}
+	.response, .request
+	{
+		padding: @line-height-computed 0;
+		&.collapsed
+		{
+			.toggle
+			{
+				.open
+				{
+					display: none;
+				}
+				.closed
+				{
+					display: block;
+				}
+			}
+		}
+		a
+		{
+			span.closed
+			{
+				display: none;
+			}
+			span.open
+			{
+				display: block;
+			}
+			&.collapsed
+			{
+				span.closed
+				{
+					display: block;
+				}
+				span.open
+				{
+					display: none;
+				}
+			}
+		}
+		pre
+		{
+			background: @content-reponse-pre-background-color;
+			border: none;
+			color: @content-reponse-pre-text-color;
+			padding: @line-height-computed/2 @line-height-computed;
+		}
+		.toggle
+		{
+			.open
+			{
+				display: block;
+			}
+			.closed
+			{
+				display: none;
+			}
+		}
+	}
+	.response-code-200, .response-code-201
+	{
+		background: #dff0d8;
+		color: #3c763d;
+	}
+	.response-code-400, .response-code-401, .response-code-404, .response-code-422
+	{
+		background: #f2dede;
+		color: #a94442;
+	}
+	.schema-popup
+	{
+		box-shadow: 0px 0px 15px 5px #b8cbb8;
+		background: #f5f5f5;
+		display: none;
+		padding: 10px;
+		position: absolute;
+		table
+		{
+			margin-bottom: 0;
+			width: auto;
+		}
+		&.active
+		{
+			display: block !important;
 		}
 	}
 }
@@ -258,4 +347,9 @@ pre
 	display: table;
 	height: 100%;
 	width: 100%;
+}
+
+.table-auto-width
+{
+	width: auto;
 }
