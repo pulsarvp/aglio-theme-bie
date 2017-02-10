@@ -21,11 +21,17 @@ benchmark =
 
 schemaSubStructures = (schema) ->
   structures = {}
+  properties = {}
 
   if schema.properties?
     properties = schema.properties
   else if schema.items?.properties?
-    properties = schema.items.properties
+    if schema.type == 'array'
+      properties[schema.items.itemType] = schema.items
+    else
+      properties = schema.items.properties
+  else if schema.items?.items?.properties?
+    properties[schema.items.items.itemType] = schema.items.items
 
   if properties?
     for name, item of properties
@@ -33,7 +39,8 @@ schemaSubStructures = (schema) ->
         structures[item.itemType] = item
         sub = schemaSubStructures(item)
         for subName, subItem of sub
-          structures[subName] = subItem
+          if subName != 'array'
+            structures[subName] = subItem
 
   structures
 
@@ -167,6 +174,7 @@ getJs = (dest, verbose, done) ->
   try
     copyFile path.join(ROOT, '..', 'jquery/dist/jquery.min.js'), path.join(dest, 'jquery.min.js')
     copyFile path.join(ROOT, '..', 'bootstrap/dist/js/bootstrap.min.js'), path.join(dest, 'bootstrap.min.js')
+    copyFile path.join(ROOT, 'js/bie.js'), path.join(dest, 'bie.js')
   catch
     return done('Error copying JS files')
 

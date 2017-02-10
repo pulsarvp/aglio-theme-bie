@@ -39,12 +39,15 @@ module.exports = renderSchema = (root, dataStructures) ->
         items.push renderSchema(item, dataStructures)
       if items.length is 1
         schema.items = items[0]
+        if (items[0].name?)
+          schema.items.itemType = items[0].name
       else if items.length > 1
         try
           schema.items = items.reduce (l, r) -> deepEqual(l, r) or r
         catch
           schema.items =
             'properties': items
+        schema.items.itemType = root.element
 
     when 'object', 'option'
       schema.type = 'object'
@@ -74,8 +77,7 @@ module.exports = renderSchema = (root, dataStructures) ->
             required: exclusive
           continue
         key = member.content.key.content
-        schema.properties[key] = renderSchema(
-          member.content.value, dataStructures)
+        schema.properties[key] = renderSchema(member.content.value, dataStructures)
         schema.properties[key].name = key
         schema.properties[key].required = false
         if member.meta?.description?

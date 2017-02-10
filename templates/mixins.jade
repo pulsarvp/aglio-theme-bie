@@ -251,8 +251,14 @@ mixin RequestResponse(title, request, resourceGroup, resource, action)
                     if request.schemaStructure
                         .tab-pane.active(role="tabpanel",id=id + "-structure")
                             div.schema-structure
-                                table.table-schema.table.table-striped.table-hover
-                                    +SchemaTable(request.schemaStructure.properties, id + '-substructure-')
+                                if request.schemaStructure.properties
+                                    table.table-schema.table.table-striped.table-hover
+                                        +SchemaTable(request.schemaStructure.properties, id + '-substructure-')
+                                else if request.schemaStructure.items.properties
+                                    if request.schemaStructure.type == 'array'
+                                        div.schema-structure-array
+                                            = 'Array of '
+                                            +ItemType(id + "-substructure-", request.schemaStructure.items)
                             if request.subStructures
                                 h4 Sub structures
                                 div.schema-substructure
