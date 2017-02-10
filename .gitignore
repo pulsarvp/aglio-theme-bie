@@ -4,5 +4,4 @@ node_modules
 npm-debug.log
 _package.json
 css
-js
-
+js/app.js
