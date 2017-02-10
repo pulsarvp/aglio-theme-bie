@@ -188,10 +188,9 @@ mixin RequestResponse(title, request, resourceGroup, resource, action)
     - var content = request.description || Object.keys(request.headers).length || request.body || request.schema
 
     div(class=title.toLowerCase())
-        strong
-            if request.name
-                | &nbsp;
-                code(class='response-code-' + request.name)= request.name
+        if request.name
+            div.response-code(class='response-code-' + request.name)
+                = request.name
                 - var text = ''
                 case request.name
                     when '200'
@@ -206,14 +205,14 @@ mixin RequestResponse(title, request, resourceGroup, resource, action)
                         - var text = 'Not Found'
                     when '422'
                         - var text = 'Unprocessable Entity'
-                if (text.length > 0)
+                if(text.length > 0)
                     = ' ' + text
-                - var status = false
-                each h in request.headers
-                    if ( h.name == 'Status' )
-                        - status = true
-                if (status == false)
-                    - request.headers.unshift({ name : 'Status', value : request.name + ' ' + text });
+            - var status = false
+            each h in request.headers
+                if ( h.name == 'Status' )
+                    - status = true
+            if (status == false)
+                - request.headers.unshift({ name : 'Status', value : request.name + ' ' + text });
         if content
             a.collapsed.response-show.btn.btn-sm.btn-default(data-toggle="collapse", data-target="##{id}")
                 span.closed Show
@@ -283,7 +282,7 @@ mixin ResourceGroup(resourceGroup, getButtonClass)
             span
                 = resourceGroup.name || 'Resource Group'
             | &nbsp;
-            a(href="#{slug(resourceGroup.name)}")
+            a(href="#{slug(resourceGroup.name)}").resource-group-anchor
                 i.fa.fa-link
         .resource-group-body
             if resourceGroup.description
@@ -293,7 +292,7 @@ mixin ResourceGroup(resourceGroup, getButtonClass)
                     span
                         = resource.name || 'Resources'
                     | &nbsp;
-                    a(href="#{slug(resourceGroup.name)}-#{slug(resource.name)}")
+                    a(href="#{slug(resourceGroup.name)}-#{slug(resource.name)}").resource-group-anchor
                         i.fa.fa-link
                 if resource.description
                     != markdown(resource.description)
@@ -315,13 +314,13 @@ mixin ResourceGroup(resourceGroup, getButtonClass)
                                 when 'DELETE': - var btnClass = 'btn-danger'
                                 default: - var btnClass = 'btn-default'
                             .btn-group.action-pattern
-                                a.btn(class=btnClass, href="##{slug(resourceGroup.name)}-#{slug(resource.name)}-#{slug(action.method)}")= action.method
-                                code.btn.btn-default= decodeURI(resource.uriTemplate)
+                                a.btn.btn-sm(class=btnClass, href="##{slug(resourceGroup.name)}-#{slug(resource.name)}-#{slug(action.method)}")= action.method
+                                code.btn.btn-sm.btn-default= decodeURI(resource.uriTemplate)
 
                             if action.description
                                 .btn-group
-                                    .btn.btn-default= 'Example'
-                                    .btn.btn-default.code!= action.description.replace('[HOST]', host)
+                                    .btn.btn-sm.btn-default.bg-grey= 'Example'
+                                    .btn.btn-sm.btn-default.code!= action.description.replace('[HOST]', host)
 
                         - var params = action.parameters.length ? action.parameters : resource.parameters
                         if params.length
