@@ -23,9 +23,20 @@ module.exports = renderSchema = (root, dataStructures) ->
         schema.example = root.content
     when 'enum'
       schema.type = 'enum'
-      schema.enum = []
+      if root.content[0]?.element? && !root.content[0]?.meta?
+        schema.itemType = root.content[0].element
+      schema.properties = []
       for item in root.content or []
-        schema.enum.push item.content
+        if item.content?
+          el = {}
+          if item.element?
+            el.type = item.element
+          else if schema.itemType?
+            el.type = schema.itemType
+          if item.meta?.description?
+            el.description = item.meta.description
+          el.name = item.content
+          schema.properties.push el
       if root.attributes?.samples?[0][0].content?
         schema.example = root.attributes.samples[0][0].content
     when 'array'

@@ -252,6 +252,8 @@ mixin RequestResponse(title, request, resourceGroup, resource, action)
                         .tab-pane.active(role="tabpanel",id=id + "-structure")
                             div.schema-structure
                                 if request.schemaStructure.properties
+                                    if request.schemaStructure.type == 'enum'
+                                        div.schema-structure-array= 'One of following values is possible'
                                     table.table-schema.table.table-striped.table-hover
                                         +SchemaTable(request.schemaStructure.properties, id + '-substructure-')
                                 else if request.schemaStructure.items.properties
