@@ -142,10 +142,10 @@ mixin SchemaTable (schema, baseId)
                 td.default= item.default
                 td.example= item.example
                 td.values
-                    if item.enum && item.enum.length
+                    if item.type == 'enum' && item.properties
                         ul.list-unstyled
-                            each value in item.enum
-                                li= value
+                            each value in item.properties
+                                li= value.name
 
 mixin SchemaPopupTable (schema, baseId)
     div.schema-popup(id=baseId)
