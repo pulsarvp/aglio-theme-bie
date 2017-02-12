@@ -326,9 +326,9 @@ mixin ResourceGroup(resourceGroup, getButtonClass)
                                 code.btn.btn-sm.btn-default= decodeURI(resource.uriTemplate)
 
                             if action.description
-                                .btn-group
-                                    .btn.btn-sm.btn-default.bg-grey= 'Example'
-                                    .btn.btn-sm.btn-default.code!= action.description.replace('[HOST]', host)
+                                .action-description
+                                    .description-text= action.description.replace('[HOST]', host)
+                                    .description-label= 'Example'
 
                         - var params = action.parameters.length ? action.parameters : resource.parameters
                         if params.length
