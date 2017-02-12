@@ -102,7 +102,7 @@ pre
 			background: #f0f0f0;
 			border-right: 1px solid #ccc;
 			bottom: 0;
-			color: #333;
+			color: #444;
 			font-family: @font-family-sans-serif;
 			font-size: @font-size-base * 0.9;
 			left: 0;
@@ -165,7 +165,50 @@ pre
 	}
 	.action-pattern
 	{
-		margin-right: @line-height-computed;
+		display: inline-block;
+		margin: 0 @line-height-computed @line-height-computed/2 0;
+		.pattern-code
+		{
+			border: 1px solid #ccc;
+			border-left: none;
+			float: left;
+			font-family: monospace;
+			padding: 5px 10px;
+		}
+		.pattern-type
+		{
+			color: #fff;
+			display: inline-block;
+			float: left;
+			padding: 5px 0;
+			text-align: center;
+			width: 65px;
+		}
+		.pattern-type-default
+		{
+			background: #777;
+			border: 1px solid darken(#777, 10%)
+		}
+		.pattern-type-delete
+		{
+			background: @brand-danger;
+			border: 1px solid darken(@brand-danger, 10%)
+		}
+		.pattern-type-get
+		{
+			background: @brand-primary;
+			border: 1px solid darken(@brand-primary, 10%)
+		}
+		.pattern-type-patch, .pattern-type-put
+		{
+			background: @brand-warning;
+			border: 1px solid darken(@brand-warning, 10%)
+		}
+		.pattern-type-post
+		{
+			background: @brand-success;
+			border: 1px solid darken(@brand-success, 10%)
+		}
 	}
 	.introduction
 	{

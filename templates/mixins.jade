@@ -315,15 +315,15 @@ mixin ResourceGroup(resourceGroup, getButtonClass)
                     section.resource-body(id="#{slug(resourceGroup.name)}-#{slug(resource.name)}-#{slug(action.method)}")
                         .action-heading(class=actionClass)
                             case action.method
-                                when 'POST': - var btnClass = 'btn-success'
-                                when 'GET': - var btnClass = 'btn-' + getButtonClass
-                                when 'PUT': - var btnClass = 'btn-warning'
-                                when 'PATCH': - var btnClass = 'btn-warning'
-                                when 'DELETE': - var btnClass = 'btn-danger'
-                                default: - var btnClass = 'btn-default'
-                            .btn-group.action-pattern
-                                a.btn.btn-sm(class=btnClass, href="##{slug(resourceGroup.name)}-#{slug(resource.name)}-#{slug(action.method)}")= action.method
-                                code.btn.btn-sm.btn-default= decodeURI(resource.uriTemplate)
+                                when 'POST': - var typeClass = 'pattern-type-post'
+                                when 'GET': - var typeClass = 'pattern-type-get'
+                                when 'PUT': - var typeClass = 'pattern-type-put'
+                                when 'PATCH': - var typeClass = 'pattern-type-patch'
+                                when 'DELETE': - var typeClass = 'pattern-type-delete'
+                                default: - var typeClass = 'pattern-type-default'
+                            .action-pattern
+                                a.pattern-type(class=typeClass, href="##{slug(resourceGroup.name)}-#{slug(resource.name)}-#{slug(action.method)}")= action.method
+                                .pattern-code= decodeURI(resource.uriTemplate)
 
                             if action.description
                                 .action-description
