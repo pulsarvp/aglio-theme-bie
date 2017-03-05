@@ -184,7 +184,7 @@ mixin SchemaSubTable (schema, baseId)
         +SchemaTable(schema.items.properties, baseId)
 
 mixin RequestResponse(title, request, resourceGroup, resource, action)
-    - var id = hash(resourceGroup.name.toString() + resource.name.toString() + action.name.toString() + action.method.toString() + title.toString() + request.name.toString() + request.headers.toString() + request.body.toString() + request.schema.toString())
+    - var id = hash(resourceGroup.name.toString() + resource.name.toString() + action.name.toString() + action.method.toString() + title.toString() + request.name.toString() + request.headers.toString() + request.body.toString() + request.schema.toString() + Math.random())
     - var content = request.description || Object.keys(request.headers).length || request.body || request.schema
     - var type = title.toLowerCase()
 
@@ -340,17 +340,19 @@ mixin ResourceGroup(resourceGroup, getButtonClass)
                                 +Parameters(params)
                         if action.examples
                             .action-examples
+                                h3= 'Examples'
                                 each example in action.examples
                                     - var hasRequests = (example.requests.length > 0 )
                                     - var hasResponses = (example.responses.length > 0 )
-                                    if hasRequests
-                                        h3= 'Requests'
-                                        each request in example.requests
-                                            +RequestResponse('Request', request, resourceGroup, resource, action)
-                                    if hasResponses
-                                        h3= 'Responses'
-                                        each response in example.responses
-                                            +RequestResponse('Response', response, resourceGroup, resource, action)
+                                    .action-example
+                                        if hasRequests
+                                            h4= 'Requests'
+                                            each request in example.requests
+                                                +RequestResponse('Request', request, resourceGroup, resource, action)
+                                        if hasResponses
+                                            h4= 'Responses'
+                                            each response in example.responses
+                                                +RequestResponse('Response', response, resourceGroup, resource, action)
 
 mixin Icon(method)
     case method

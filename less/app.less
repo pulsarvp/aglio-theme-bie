@@ -126,6 +126,21 @@ pre
 		{
 			margin-bottom: floor(@line-height-computed * 0.75);
 		}
+		h4
+		{
+			font-size: @font-size-base * 1.2;
+			margin-bottom: floor(@line-height-computed * 0.5);
+		}
+	}
+	.action-example
+	{
+		border-left: 2px solid @content-action-example-border-color;
+		margin-left: -12px;
+		padding-left: 10px;
+		&:not(:last-child)
+		{
+			margin-bottom: 20px;
+		}
 	}
 	.action-heading
 	{
