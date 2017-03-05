@@ -186,8 +186,9 @@ mixin SchemaSubTable (schema, baseId)
 mixin RequestResponse(title, request, resourceGroup, resource, action)
     - var id = hash(resourceGroup.name.toString() + resource.name.toString() + action.name.toString() + action.method.toString() + title.toString() + request.name.toString() + request.headers.toString() + request.body.toString() + request.schema.toString())
     - var content = request.description || Object.keys(request.headers).length || request.body || request.schema
+    - var type = title.toLowerCase()
 
-    div(class=title.toLowerCase())
+    div(class=type)
         if request.name
             div.response-code(class='response-code-' + request.name)
                 = request.name
@@ -213,13 +214,15 @@ mixin RequestResponse(title, request, resourceGroup, resource, action)
                     - status = true
             if (status == false)
                 - request.headers.unshift({ name : 'Status', value : request.name + ' ' + text });
-        if content
+        if content && type == 'response'
             a.collapsed.response-show.btn.btn-sm.btn-default(data-toggle="collapse", data-target="##{id}")
                 span.closed Show
                 span.open Hide
 
         if content
-            div.collapse(id=id,class=title.toLowerCase() + '-content')
+            - var cl = type + '-content'
+            - if (type == 'request') cl += ' in'
+            div.collapse(id=id,class=cl)
                 if request.description
                     .description!= markdown(request.description)
 
@@ -337,8 +340,17 @@ mixin ResourceGroup(resourceGroup, getButtonClass)
                                 +Parameters(params)
                         if action.examples
                             .action-examples
-                                h3= 'Responses'
-                                +Examples(resourceGroup, resource, action)
+                                each example in action.examples
+                                    - var hasRequests = (example.requests.length > 0 )
+                                    - var hasResponses = (example.responses.length > 0 )
+                                    if hasRequests
+                                        h3= 'Requests'
+                                        each request in example.requests
+                                            +RequestResponse('Request', request, resourceGroup, resource, action)
+                                    if hasResponses
+                                        h3= 'Responses'
+                                        each response in example.responses
+                                            +RequestResponse('Response', response, resourceGroup, resource, action)
 
 mixin Icon(method)
     case method
