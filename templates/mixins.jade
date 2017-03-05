@@ -190,7 +190,7 @@ mixin RequestResponse(title, request, resourceGroup, resource, action)
 
     div(class=type)
         if request.name
-            div.response-code(class='response-code-' + request.name)
+            div.response-code(class='response-code-' + request.name.substr(0, 1) + 'xx')
                 = request.name
                 - var text = ''
                 case request.name
@@ -198,12 +198,16 @@ mixin RequestResponse(title, request, resourceGroup, resource, action)
                         - var text = 'OK'
                     when '201'
                         - var text = 'Created'
+                    when '304'
+                        - var text = 'Not Modified'
                     when '400'
                         - var text = 'Bad Request'
                     when '401'
                         - var text = 'Unauthorized'
                     when '404'
                         - var text = 'Not Found'
+                    when '405'
+                        - var text = 'Method Not Allowed'
                     when '422'
                         - var text = 'Unprocessable Entity'
                 if(text.length > 0)

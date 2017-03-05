@@ -354,12 +354,17 @@ pre
 		line-height: 1.5;
 		padding: 5px 10px;
 	}
-	.response-code-200, .response-code-201
+	.response-code-2xx
 	{
 		background: @response-code-200-background-color;
 		color: @response-code-200-text-color;
 	}
-	.response-code-400, .response-code-401, .response-code-404, .response-code-422
+	.response-code-3xx
+	{
+		background: @response-code-300-background-color;
+		color: @response-code-300-text-color;
+	}
+	.response-code-4xx
 	{
 		background: @response-code-400-background-color;
 		color: @response-code-400-text-color;
